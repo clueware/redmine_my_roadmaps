@@ -1,0 +1,159 @@
+<%
+# My Roadmaps - Redmine plugin to expose global roadmaps 
+# Copyright (C) 2012 Stéphane Rondinaud
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+%>
+<% form_tag({}, :method => :post, :style => "float: right; margin-right: 10em;" ) do %>
+<label><%= check_box_tag 'all_trackers', 1, @all_trackers %> <%= l(:label_all_issue_type) %></label>
+<%= submit_tag l(:button_refresh), :name => 'submit' %>
+<% end %>
+<h2><%= l(:my_roadmaps_name) %></h2>
+<div id="roadmaps">
+	<% @user_synthesis.sort{|a,b| a[0].project.name+'_'+a[0].name<=>b[0].project.name+'_'+b[0].name}.each { |version,synthesis| 
+		%>
+		<h3 class="version">
+			<%= link_to version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id} %> -  
+			<%= link_to version.name, {:controller => 'versions', :action => 'show', :id => version.id} %>
+			<span style="font-size:0.7em;">
+				<%= "("+l(:version_status_locked)+")" if version.status == 'locked' %>
+				<%= link_to l(:button_edit), {:controller => 'versions', :action => 'edit', :id => version.id} %>
+			</span>
+		</h3>
+		
+		<% 
+			trackers = synthesis.trackers
+			trackers.sort{|a,b| a.wrapped_tracker.name<=>b.wrapped_tracker.name}.each{ |tracker_wrapper|
+				tracker = tracker_wrapper.wrapped_tracker
+				done_overall_pct = ((tracker_wrapper.closed_nb.to_f+(tracker_wrapper.done_nb.to_f*tracker_wrapper.done_pct.to_f/100.0))/tracker_wrapper.total_root_nb)*100
+				done_overall_pct = done_overall_pct.round
+				opened_left_pct = 100-done_overall_pct
+				tracker_style = "t"+(@tracker_numbers.index(tracker.id)%10).to_s
+				closed_tracker_style = "#{tracker_style}_closed"
+				done_tracker_style = "#{tracker_style}_done"
+				opened_tracker_style = "#{tracker_style}_opened"
+		%>
+		<table class="progress" style="width: 40%; height: 1em;">
+			<tr>
+				<% unless tracker_wrapper.closed_nb == 0 %>
+					<td class="<%= closed_tracker_style %>" 
+						style="width:<%= tracker_wrapper.closed_pct %>%"></td>
+				<% end
+				   unless tracker_wrapper.done_nb == 0 %>
+					<td class="<%= done_tracker_style %>" 
+						style="width:<%= tracker_wrapper.done_pct/tracker_wrapper.total_root_nb %>%"></td>
+				<% end
+				   if opened_left_pct>0 %>
+					<td class="<%= opened_tracker_style %>" 
+						style="width:<%= opened_left_pct %>%"></td>
+				<% end %>
+			</tr>
+		</table>
+		<p class="pourcent"><%= tracker.name+" "+done_overall_pct.to_s %>%</p>
+		<p class="progress-info"><%= link_to_if(tracker_wrapper.closed_nb > 0, 
+					l(:label_x_closed_issues_abbr, :count => tracker_wrapper.closed_nb), 
+					:controller => 'issues', 
+					:action => 'index', 
+					:project_id => version.project, 
+					:tracker_id => tracker, 
+					:status_id => 'c', 
+					:fixed_version_id => version, 
+					:set_filter => 1) +
+				"("+tracker_wrapper.closed_pct.to_s+"%) "+ 
+				link_to_if(tracker_wrapper.opened_nb > 0, 
+					l(:label_x_open_issues_abbr, :count => tracker_wrapper.opened_nb), 
+					:controller => 'issues', 
+					:action => 'index', 
+					:project_id => version.project, 
+					:tracker_id => tracker, 
+					:status_id => 'o', 
+					:fixed_version_id => version, 
+					:set_filter => 1)+ 
+				"("+tracker_wrapper.opened_pct.to_s+"%)" %></p>
+		<%
+			}
+		%>
+		<% issues = synthesis.issues
+		   if !issues.nil? && issues.length>0 %>
+		<% form_tag({}) do -%>
+		  <table class="list tracker" style="width: 70%; font-size: 90%;">
+		  <caption><%= l(:label_related_issues) %></caption>
+	  	  <tr style="height: 5px; padding: 0px; margin:0px;">
+	  	  	<td style="width: 5px;"/>
+	  	  	<% 10.times {%><td style="width: 10%;"/><%}%>
+	  	  	<td style="width: 5px;"/>
+	  	  </tr>
+		  <% 
+		  	issues.sort!{ |a,b| a.wrapped_issue.tracker.name+"_"+a.wrapped_issue.lft.to_s <=> b.wrapped_issue.tracker.name+"_"+b.wrapped_issue.lft.to_s }.each { |issue_wrapper| 
+		  	issue = issue_wrapper.wrapped_issue 
+		  	issue_class = "t"+(@tracker_numbers.index(issue.tracker.id)%10).to_s
+		  	if issue_wrapper.depth >0
+		  		child_issue = " childissue"
+			  	issue_div_style = "margin-left: "+((issue_wrapper.depth-1)*10).to_s+"px;"
+		  	else
+		  		child_issue = ""
+			  	issue_div_style = ""
+		  	end
+		  	 %>
+		    <tr>
+		      <td/>
+		      <% if issue.closed? %>
+			      <td colspan="9" class="<%= issue_class %>_closed tracker<%= child_issue %>">
+			      	<div style="<%= issue_div_style %>">
+				      	<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
+			      	</div>
+			      </td>
+		      	  <td class="<%= issue_class %>_closed tracker<%= child_issue %>">100%</td>
+		      <% else %>
+		      	<% if (issue.done_ratio/10)==0 %>
+					<td >
+						<div>
+							<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
+						</div>
+					</td>
+					<td colspan="9" class="<%= issue_class %>_opened">
+						<%= issue.done_ratio%>%
+					</td>
+	      		<% elsif (issue.done_ratio/10)==10 %>
+					<td colspan="9" class="<%= issue_class %>_done<%= child_issue %>">
+						<div style="<%= issue_div_style %>">
+							<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
+						</div>
+					</td>
+					<td colspan="<%= 10-(issue.done_ratio/10) %>" class="<%= issue_class %>_done<%= child_issue %>">
+						<%= issue.done_ratio%>%
+					</td>
+	      		<% else %>
+					<td colspan="<%= issue.done_ratio/10 %>" class="<%= issue_class %>_done<%= child_issue %>" 
+					style="white-space: nowrap; overflow: visible;">
+						<div style="<%= issue_div_style %>">
+							<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
+						</div>
+					</td>
+					<td colspan="<%= 10-(issue.done_ratio/10) %>" class="<%= issue_class %>_opened<%= child_issue %>">
+						<%= issue.done_ratio%>%
+					</td>
+		      	<% end %>
+		      <% end %>
+		      <td/>
+		    </tr>
+		  <% } %>
+	  	  <tr style="height: 5px; padding: 0px; margin:0px;"><td colspan="12"/></tr>
+		  </table>
+		<% end
+		end %>
+	<p>
+	<% } %>
+</div>

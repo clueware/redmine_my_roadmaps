@@ -1,0 +1,52 @@
+table.tracker tr td {
+	white-space: nowrap; 
+	text-align: right;
+}
+table.tracker tr td div {
+	position: absolute;
+}
+
+td.childissue div {
+	padding-left: 16px;
+	background: url("../../../images/bullet_arrow_right.png") no-repeat scroll 0 50% transparent;
+}
+
+.t0_closed { background-color: #4DCC33 }
+.t0_done { background-color: #A6FF8C }
+.t0_opened { background-color: #FFFFFF }
+
+.t1_closed { background-color: #F55F79 }
+.t1_done { background-color: #FF8CA6 }
+.t1_opened { background-color: #FFFFFF }
+
+.t2_closed { background-color: #8CA6FF }
+.t2_done { background-color: #CCE6FF }
+.t2_opened { background-color: #FFFFFF }
+
+.t3_closed { background-color: #CC6633 }
+.t3_done { background-color: #FFBF8C }
+.t3_opened { background-color: #FFFFFF }
+
+.t4_closed { background-color: #99CC33 }
+.t4_done { background-color: #CCFF66 }
+.t4_opened { background-color: #FFFFFF }
+
+.t5_closed { background-color: #B333CC }
+.t5_done { background-color: #FF8CFF }
+.t5_opened { background-color: #FFFFFF }
+
+.t6_closed { background-color: #95AAC4 }
+.t6_done { background-color: #D0E5FF }
+.t6_opened { background-color: #FFFFFF }
+
+.t7_closed { background-color: #886B64 }
+.t7_done { background-color: #FFE2DB }
+.t7_opened { background-color: #FFFFFF }
+
+.t8_closed { background-color: #3399CC }
+.t8_done { background-color: #66CCFF }
+.t8_opened { background-color: #FFFFFF }
+
+.t9_closed { background-color: #CC6699 }
+.t9_done { background-color: #FF99CC }
+.t9_opened { background-color: #FFFFFF }
