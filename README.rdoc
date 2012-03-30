@@ -1,0 +1,8 @@
+= my_roadmaps
+
+This plugin provides global roadmaps for all the projects of the user.
+
+All your comments are greatly welcome: this is my first attempt at Ruby, Rails and Redmine plugin, so it most probably won't qualify as "state of the art".
+
+
+It is licensed under the GPL v2. See http://www.gnu.org/licenses/old-licenses/gpl-2.0.html for further details.
