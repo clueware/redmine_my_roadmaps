@@ -1,3 +1,9 @@
+h2.project {
+	text-align: center;
+	width: 100%;
+	border-bottom: 1px solid black;
+	margin-top: 1em;
+}
 table.tracker tr td {
 	white-space: nowrap; 
 	text-align: right;
