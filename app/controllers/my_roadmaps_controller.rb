@@ -39,18 +39,14 @@ class MyRoadmapsController < ApplicationController
         @tracker_numbers.push(tracker.id)
       }
     end
-    
-    user_issues = Issue.find(:all, :visible)
-    Version.find(:all, :visible, :conditions => ['status <> ?', 'closed' ]).select{|version| version.project.visible? }.each{|version|
-      issues = user_issues.select{|iss|
-        @tracker_numbers.include?(iss.tracker.id) &&
-        iss.visible? && (
-        iss.fixed_version_id==version.id ||
-        user_issues.select{|subiss|
-          subiss.root_id==iss.root_id &&
-          subiss.fixed_version_id==version.id
-        }.length>0)
-      }
+
+    Version.find(:all, :visible, :conditions => ['versions.status <> ?', 'closed']) \
+      .select{|version| version.project.visible? && !version.completed? } \
+      .each{|version|
+        issues = Issue.find(:all, :visible, :conditions => ['fixed_version_id = ? && tracker_id in (?)', version.id, @tracker_numbers]) \
+        .select{|iss|
+          (iss.root_id == iss.id || Issue.find(:all, :conditions => ['root_id = ? and fixed_version_id = ?', iss.root_id, version.id]).length>0)
+        }
       @user_synthesis[version] = VersionSynthesis.new(version, issues)
     }
   end
