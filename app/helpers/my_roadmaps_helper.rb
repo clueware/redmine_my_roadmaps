@@ -1,4 +1,4 @@
-# My Roadmaps - Redmine plugin to expose global roadmaps 
+# My Roadmaps - Redmine plugin to expose global roadmaps
 # Copyright (C) 2012 Stéphane Rondinaud
 #
 # This program is free software; you can redistribute it and/or
@@ -16,4 +16,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 module MyRoadmapsHelper
+  def splitVersionName(versionName)
+    return versionName.split(/[^a-zA-Z0-9]/).compact.map{ |elem|
+      (elem.to_i.to_s!=elem)?(elem.to_s):('%010d' % elem.to_i)
+     }
+  end
 end

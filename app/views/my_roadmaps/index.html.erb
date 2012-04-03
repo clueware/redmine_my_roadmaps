@@ -22,7 +22,12 @@
 <% end %>
 <h2><%= l(:my_roadmaps_name) %></h2>
 <div id="roadmaps">
-	<% @user_synthesis.sort{|a,b| a[0].project.name+'_'+a[0].name<=>b[0].project.name+'_'+b[0].name}.each { |version,synthesis| 
+	<%  prevProjectId=nil
+		@user_synthesis.sort{|a,b| [a[0].project.name.upcase, splitVersionName(a[0].name)]<=>[b[0].project.name.upcase, splitVersionName(b[0].name)]}.each { |version,synthesis|
+		if prevProjectId.nil? || prevProjectId!=version.project.id
+			prevProjectId=version.project.id
+			%><h2 class="project"><%= link_to version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id} %></h2><%
+		end
 		%>
 		<h3 class="version">
 			<%= link_to version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id} %> -  
@@ -49,15 +54,15 @@
 			<tr>
 				<% unless tracker_wrapper.closed_nb == 0 %>
 					<td class="<%= closed_tracker_style %>" 
-						style="width:<%= tracker_wrapper.closed_pct %>%"></td>
+						style="width:<%= tracker_wrapper.closed_pct.round %>%"></td>
 				<% end
-				   unless tracker_wrapper.done_nb == 0 %>
+				   if tracker_wrapper.done_nb > 0 %>
 					<td class="<%= done_tracker_style %>" 
-						style="width:<%= tracker_wrapper.done_pct/tracker_wrapper.total_root_nb %>%"></td>
+						style="width:<%= (tracker_wrapper.done_pct/tracker_wrapper.total_root_nb).round %>%"></td>
 				<% end
-				   if opened_left_pct>0 %>
+				   if opened_left_pct.round>0 %>
 					<td class="<%= opened_tracker_style %>" 
-						style="width:<%= opened_left_pct %>%"></td>
+						style="width:<%= opened_left_pct.round %>%"></td>
 				<% end %>
 			</tr>
 		</table>
