@@ -32,12 +32,11 @@ class TrackerWrapper
   
   def addIssue(issue)
     @total_nb += 1
-    @opened_nb = @total_nb - @closed_nb
     
     if issue.root_id == issue.id
       @closed_nb += 1 if issue.closed?
       @total_root_nb += 1
-      if issue.done_ratio > 0
+      if issue.done_ratio > 0 && !issue.closed?
         @sum_done_pct += issue.done_ratio 
         @done_nb += 1
       end
@@ -45,6 +44,8 @@ class TrackerWrapper
     if @done_nb>0
       @done_pct = @sum_done_pct.to_f/@done_nb
     end
+
+    @opened_nb = @total_nb - @closed_nb
     @closed_pct = @closed_nb*100/@total_nb
     @opened_pct = @opened_nb*100/@total_nb
   end
