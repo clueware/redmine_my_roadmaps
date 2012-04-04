@@ -28,28 +28,33 @@ class MyRoadmapsController < ApplicationController
       @user_synthesis.clear
     end
     
-    @tracker_numbers = Array.new
+    @tracker_styles = Hash.new
     @all_trackers = params[:all_trackers] ? params[:all_trackers].present? : false
     if @all_trackers
-      Tracker.find(:all).sort{ |a,b| a.id<=>b.id }.each{ |tracker|
-        @tracker_numbers.push(tracker.id)
-      }
+      tracker_list = Tracker.find(:all).sort!{ |a,b| a.id<=>b.id }
     else 
-      Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1]).sort{ |a,b| a.id<=>b.id }.each{ |tracker|
-        @tracker_numbers.push(tracker.id)
-      }
+      tracker_list = Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1]).sort!{ |a,b| a.id<=>b.id }
     end
+    index=0
+    tracker_list.each{ |tracker|
+      @tracker_styles[tracker]=Hash.new
+      @tracker_styles[tracker][:opened] = "t"+(index%10).to_s+"_opened"
+      @tracker_styles[tracker][:done] = "t"+(index%10).to_s+"_done"
+      @tracker_styles[tracker][:closed] = "t"+(index%10).to_s+"_closed"
+      index += 1
+    }
 
     Version.find(:all, :visible, :conditions => ['versions.status <> ?', 'closed']) \
       .select{|version| version.project.visible? && !version.completed? } \
       .each{|version|
-        issues = Issue.find(:all, :visible, :conditions => ['fixed_version_id = ? && tracker_id in (?)', version.id, @tracker_numbers]) \
+        issues = Issue.find(:all, :visible, :conditions => ['fixed_version_id = ? && tracker_id in (?)', version.id, @tracker_styles.keys]) \
         .select{|iss|
           (iss.root_id == iss.id || Issue.find(:all, :conditions => ['root_id = ? and fixed_version_id = ?', iss.root_id, version.id]).length>0)
         }
       @user_synthesis[version] = VersionSynthesis.new(version, issues)
     }
   end
+  
   
   private
   

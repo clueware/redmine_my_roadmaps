@@ -44,10 +44,9 @@
 				tracker = tracker_wrapper.wrapped_tracker
 				done_overall_pct = tracker_wrapper.overall_done_pct.round
 				opened_left_pct = 100-done_overall_pct
-				tracker_style = "t"+(@tracker_numbers.index(tracker.id)%10).to_s
-				closed_tracker_style = "#{tracker_style}_closed"
-				done_tracker_style = "#{tracker_style}_done"
-				opened_tracker_style = "#{tracker_style}_opened"
+				closed_tracker_style = @tracker_styles[tracker][:closed]
+				done_tracker_style = @tracker_styles[tracker][:done]
+				opened_tracker_style = @tracker_styles[tracker][:opened]
 		%>
 		<table class="progress" style="width: 40%; height: 1em;">
 			<tr>
@@ -102,7 +101,6 @@
 		  <% 
 		  	issues.sort!{ |a,b| a.wrapped_issue.tracker.name+"_"+a.wrapped_issue.lft.to_s <=> b.wrapped_issue.tracker.name+"_"+b.wrapped_issue.lft.to_s }.each { |issue_wrapper| 
 		  	issue = issue_wrapper.wrapped_issue 
-		  	issue_class = "t"+(@tracker_numbers.index(issue.tracker.id)%10).to_s
 		  	if issue_wrapper.depth >0
 		  		child_issue = " childissue"
 			  	issue_div_style = "margin-left: "+((issue_wrapper.depth-1)*10).to_s+"px;"
@@ -114,12 +112,12 @@
 		    <tr>
 		      <td/>
 		      <% if issue.closed? %>
-			      <td colspan="9" class="<%= issue_class %>_closed tracker<%= child_issue %>">
+			      <td colspan="9" class="<%= @tracker_styles[issue.tracker][:closed] %> tracker<%= child_issue %>">
 			      	<div style="<%= issue_div_style %>">
 				      	<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
 			      	</div>
 			      </td>
-		      	  <td class="<%= issue_class %>_closed tracker<%= child_issue %>">100%</td>
+		      	  <td class="<%= @tracker_styles[issue.tracker][:closed] %> tracker<%= child_issue %>">100%</td>
 		      <% else %>
 		      	<% if (issue.done_ratio/10)==0 %>
 					<td >
@@ -127,26 +125,26 @@
 							<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
 						</div>
 					</td>
-					<td colspan="9" class="<%= issue_class %>_opened">
+					<td colspan="9" class="<%= @tracker_styles[issue.tracker][:opened] %>">
 						<%= issue.done_ratio%>%
 					</td>
 	      		<% elsif (issue.done_ratio/10)==10 %>
-					<td colspan="9" class="<%= issue_class %>_done<%= child_issue %>">
+					<td colspan="9" class="<%= @tracker_styles[issue.tracker][:done] %><%= child_issue %>">
 						<div style="<%= issue_div_style %>">
 							<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
 						</div>
 					</td>
-					<td colspan="<%= 10-(issue.done_ratio/10) %>" class="<%= issue_class %>_done<%= child_issue %>">
+					<td colspan="<%= 10-(issue.done_ratio/10) %>" class="<%= @tracker_styles[issue.tracker][:done] %><%= child_issue %>">
 						<%= issue.done_ratio%>%
 					</td>
 	      		<% else %>
-					<td colspan="<%= issue.done_ratio/10 %>" class="<%= issue_class %>_done<%= child_issue %>" 
+					<td colspan="<%= issue.done_ratio/10 %>" class="<%= @tracker_styles[issue.tracker][:done] %><%= child_issue %>" 
 					style="white-space: nowrap; overflow: visible;">
 						<div style="<%= issue_div_style %>">
 							<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
 						</div>
 					</td>
-					<td colspan="<%= 10-(issue.done_ratio/10) %>" class="<%= issue_class %>_opened<%= child_issue %>">
+					<td colspan="<%= 10-(issue.done_ratio/10) %>" class="<%= @tracker_styles[issue.tracker][:opened] %><%= child_issue %>">
 						<%= issue.done_ratio%>%
 					</td>
 		      	<% end %>
