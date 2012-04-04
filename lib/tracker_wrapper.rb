@@ -19,17 +19,28 @@ class TrackerWrapper
   def initialize(version, tracker)
     @wrapped_tracker = tracker
     @version = version
+    # total issue number
     @total_nb = 0
+    # closed issue number
     @closed_nb = 0
+    # number of issues presenting a completion ratio > 0, excluding closed one
     @done_nb = 0
+    # average completion of the @done_nb issues
     @done_pct = 0.0
-    @sum_done_pct = 0
+    # opened issues number
     @opened_nb = 0
+    # % of closed issues
     @closed_pct = 0
+    # % of opened issues
     @opened_pct = 0
+    # total number of root issues for the wrapped tracker
     @total_root_nb = 0
+
+    # @done_pct accumulator 
+    @sum_done_pct = 0
   end
   
+  # adds a new issue to the statistics
   def addIssue(issue)
     @total_nb += 1
     
@@ -50,5 +61,9 @@ class TrackerWrapper
     @opened_pct = @opened_nb*100/@total_nb
   end
   
+  # returns the overall done %, taking into account closed issues and % done
+  def overall_done_pct
+    return ((@closed_nb.to_f+(@done_nb.to_f*@done_pct.to_f/100.0))/@total_root_nb)*100
+  end
   attr_reader :wrapped_tracker, :total_nb, :total_root_nb, :closed_nb, :done_nb, :done_pct, :opened_nb, :closed_pct, :opened_pct
 end
