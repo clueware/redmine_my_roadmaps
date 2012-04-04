@@ -30,6 +30,7 @@ class MyRoadmapsController < ApplicationController
     
     @tracker_styles = Hash.new
     @all_trackers = params[:all_trackers] ? params[:all_trackers].present? : false
+    @exclude_closed_issues = params[:exclude_closed_issues] ? params[:exclude_closed_issues].present? : false
     if @all_trackers
       tracker_list = Tracker.find(:all).sort!{ |a,b| a.id<=>b.id }
     else 

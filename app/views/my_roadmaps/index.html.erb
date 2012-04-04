@@ -18,6 +18,7 @@
 %>
 <% form_tag({}, :method => :post, :style => "float: right; margin-right: 10em;" ) do %>
 <label><%= check_box_tag 'all_trackers', 1, @all_trackers %> <%= l(:label_all_issue_type) %></label>
+<label><%= check_box_tag 'exclude_closed_issues', 1, @exclude_closed_issues %> <%= l(:label_exclude_closed_issues) %></label>
 <%= submit_tag l(:button_refresh), :name => 'submit' %>
 <% end %>
 <h2><%= l(:my_roadmaps_name) %></h2>
@@ -92,14 +93,19 @@
 		   if !issues.nil? && issues.length>0 %>
 		<% form_tag({}) do -%>
 		  <table class="list tracker" style="width: 70%; font-size: 90%;">
-		  <caption><%= l(:label_related_issues) %></caption>
+		  <caption>
+		  	<%= l(:label_related_issues) %>
+		  	<%= l(:label_x_closed_issue_not_shown, :count => synthesis.closed_nb) unless !@exclude_closed_issues || synthesis.closed_nb==0 %>
+		  </caption>
 	  	  <tr style="height: 5px; padding: 0px; margin:0px;">
 	  	  	<td style="width: 5px;"/>
 	  	  	<% 10.times {%><td style="width: 10%;"/><%}%>
 	  	  	<td style="width: 5px;"/>
 	  	  </tr>
 		  <% 
-		  	issues.sort!{ |a,b| a.wrapped_issue.tracker.name+"_"+a.wrapped_issue.lft.to_s <=> b.wrapped_issue.tracker.name+"_"+b.wrapped_issue.lft.to_s }.each { |issue_wrapper| 
+		  	issues.sort!{ |a,b| a.wrapped_issue.tracker.name+"_"+a.wrapped_issue.lft.to_s <=> b.wrapped_issue.tracker.name+"_"+b.wrapped_issue.lft.to_s } \
+		  		.reject{ |issue_wrapper| issue_wrapper.wrapped_issue.closed? unless !@exclude_closed_issues } \
+		  		.each { |issue_wrapper| 
 		  	issue = issue_wrapper.wrapped_issue 
 		  	if issue_wrapper.depth >0
 		  		child_issue = " childissue"
