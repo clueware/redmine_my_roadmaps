@@ -16,9 +16,14 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 module MyRoadmapsHelper
+  
+  # splits a version name into its constituents, returning an array.
+  # Numeric values are converted to a string on 10 positions to ease comparison
+  # with non-numeric strings
   def splitVersionName(versionName)
     return versionName.split(/[^a-zA-Z0-9]/).compact.map{ |elem|
       (elem.to_i.to_s!=elem)?(elem.to_s):('%010d' % elem.to_i)
      }
   end
+  
 end
