@@ -33,7 +33,7 @@ class VersionSynthesis
         current_tracker = @trackers.select{|wrapper| wrapper.wrapped_tracker == issue.tracker }[0]
       end
       current_tracker.addIssue(issue)
-      depth=issues.reject{|rej| !(rej.lft<issue.lft && rej.rgt>issue.rgt && rej.id!=issue.id) }.length
+      depth=issues.select{|iss| (iss.lft<issue.lft) && (iss.rgt>issue.rgt) && (iss.id!=issue.id) && (iss.root_id==issue.root_id) }.length
       @issues.push(IssueWrapper.new(issue,depth))
       if @max_depth<depth
         @max_depth = depth
