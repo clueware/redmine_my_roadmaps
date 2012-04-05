@@ -126,12 +126,12 @@
 		      	  <td class="<%= @tracker_styles[issue.tracker][:closed] %> tracker<%= child_issue %>">100%</td>
 		      <% else %>
 		      	<% if (issue.done_ratio/10)==0 %>
-					<td >
-						<div>
+			      <td colspan="9" class="<%= @tracker_styles[issue.tracker][:opened] %> tracker<%= child_issue %>">
+						<div style="<%= issue_div_style %>">
 							<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
 						</div>
 					</td>
-					<td colspan="9" class="<%= @tracker_styles[issue.tracker][:opened] %>">
+					<td class="<%= @tracker_styles[issue.tracker][:opened] %>">
 						<%= issue.done_ratio%>%
 					</td>
 	      		<% elsif (issue.done_ratio/10)==10 %>
