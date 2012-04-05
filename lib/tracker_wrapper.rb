@@ -63,7 +63,12 @@ class TrackerWrapper
   
   # returns the overall done %, taking into account closed issues and % done
   def overall_done_pct
-    return ((@closed_nb.to_f+(@done_nb.to_f*@done_pct.to_f/100.0))/@total_root_nb)*100
+      result = 0
+    if @total_root_nb>0
+      result = ((@closed_nb.to_f+(@done_nb.to_f*@done_pct.to_f/100.0))/@total_root_nb)*100
+    end
+    return result
   end
+  
   attr_reader :wrapped_tracker, :total_nb, :total_root_nb, :closed_nb, :done_nb, :done_pct, :opened_nb, :closed_pct, :opened_pct
 end
