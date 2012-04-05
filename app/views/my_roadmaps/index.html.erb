@@ -103,8 +103,8 @@
 	  	  	<td style="width: 5px;"/>
 	  	  </tr>
 		  <% 
-		  	issues.sort!{ |a,b| a.wrapped_issue.tracker.name+"_"+a.wrapped_issue.lft.to_s <=> b.wrapped_issue.tracker.name+"_"+b.wrapped_issue.lft.to_s } \
-		  		.reject{ |issue_wrapper| issue_wrapper.wrapped_issue.closed? unless !@exclude_closed_issues } \
+		  	issues.reject{ |issue_wrapper| issue_wrapper.wrapped_issue.closed? unless !@exclude_closed_issues } \
+		  		.sort!{ |a,b| [a.wrapped_issue.tracker.name, a.wrapped_issue.root_id, a.wrapped_issue.lft]<=>[b.wrapped_issue.tracker.name, b.wrapped_issue.root_id, b.wrapped_issue.lft] } \
 		  		.each { |issue_wrapper| 
 		  	issue = issue_wrapper.wrapped_issue 
 		  	if issue_wrapper.depth >0
