@@ -16,10 +16,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 %>
-<% form_tag({}, :method => :post, :style => "float: right; margin-right: 10em;" ) do %>
-<label><%= check_box_tag 'all_trackers', 1, @all_trackers %> <%= l(:label_all_issue_type) %></label>
-<label><%= check_box_tag 'exclude_closed_issues', 1, @exclude_closed_issues %> <%= l(:label_exclude_closed_issues) %></label>
-<%= submit_tag l(:button_refresh), :name => 'submit' %>
+<% form_tag({ :controller => 'my_roadmaps', :action => 'index'}, :method => :get, :id => 'query_form') do %>
+    <%= hidden_field_tag 'set_filter', '1' %>
+    <div id="query_form_content" class="hide-when-print">
+    <fieldset id="filters" class="collapsible <%= @query.new_record? ? "" : "collapsed" %>">
+      <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
+      <div style="<%= @query.new_record? ? "" : "display: none;" %>">
+        <%= render :partial => 'queries/filters', :locals => {:query => @query} %>
+      </div>
+    </fieldset>
+    </div>
+    <p class="buttons hide-when-print">
+	    <%= link_to_function l(:button_apply), "$('query_form').submit()", :class => 'icon icon-checked' %>
+	    <%= link_to l(:button_clear), { :set_filter => 0 }, :class => 'icon icon-reload'  %>
+    </p>
 <% end %>
 <h2><%= l(:my_roadmaps_name) %></h2>
 <div id="roadmaps">
