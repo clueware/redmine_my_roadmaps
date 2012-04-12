@@ -65,7 +65,7 @@ class MyRoadmapsController < ApplicationController
         .select{|iss|
           (iss.root_id == iss.id || Issue.find(:all, :conditions => ['root_id = ? and fixed_version_id = ?', iss.root_id, version.id]).length>0)
         }
-      @user_synthesis[version] = VersionSynthesis.new(version, issues)
+      @user_synthesis[version] = VersionSynthesis.new(version, issues) if issues.length > 0
     }
   end
   
