@@ -18,9 +18,8 @@
 # French strings go here for Rails i18n
 fr:
   my_roadmaps_name: Mes roadmaps
+  my_roadmaps_no_version_match: Aucune version ne correspond au critère. 
   permission_view_my_roadmaps: Voir "Mes Roadmaps"
-  label_all_issue_type: Tout type de demande
-  label_exclude_closed_issues: Exclude les demandes fermées
   label_x_closed_issue_not_shown:
     zero: " (0 demande fermée non incluse)"
     one: " (1 demande fermée non incluse)"
