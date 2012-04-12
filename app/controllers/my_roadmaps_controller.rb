@@ -56,12 +56,14 @@ class MyRoadmapsController < ApplicationController
       index += 1
     }
 
+    # condition hacked from the Query model to match versions
     condition = '(versions.status <> \'closed\')'
     condition += ' and '+@query.statement_for('project_id').sub('issues','versions') if @query.has_filter?('project_id')
-    Version.find(:all, :visible, :conditions => [condition] ) \
-      .select{|version| version.project.visible? && !version.completed? } \
+
+    Version.visible.find(:all, :conditions => [condition] ) \
+      .select{|version| !version.completed? } \
       .each{|version|
-        issues = Issue.find(:all, :visible, :conditions => ['fixed_version_id = ? && tracker_id in (?)', version.id, @tracker_styles.keys]) \
+        issues = Issue.visible.find(:all, :conditions => ['fixed_version_id = ? and tracker_id in (?)', version.id, @tracker_styles.keys]) \
         .select{|iss|
           (iss.root_id == iss.id || Issue.find(:all, :conditions => ['root_id = ? and fixed_version_id = ?', iss.root_id, version.id]).length>0)
         }
