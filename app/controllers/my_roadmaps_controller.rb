@@ -24,15 +24,8 @@ class MyRoadmapsController < ApplicationController
   helper :queries
   include QueriesHelper
   
-  @@filters = { "project_id" => { :type => :list, :order => 1, :values => Project.find(:all, :visible).sort{|a,b| a.self_and_ancestors.join('/')<=>b.self_and_ancestors.join('/') }.collect{|s| [s.self_and_ancestors.join('/'), s.id.to_s] } },
-                           "status_id" => { :type => :list_status, :order => 3, :values => IssueStatus.find(:all, :order => 'position').collect{|s| [s.name, s.id.to_s] } },
-                           "tracker_id" => { :type => :list, :order => 2, :values => Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1]).collect{|s| [s.name, s.id.to_s] } }
-                         }
-  @@filters = { "project_id" => { :type => :list_optional, :order => 1, :values => Project.find(:all, :visible).sort{|a,b| a.self_and_ancestors.join('/')<=>b.self_and_ancestors.join('/') }.collect{|s| [s.self_and_ancestors.join('/'), s.id.to_s] } },
-                           "tracker_id" => { :type => :list, :order => 2, :values => Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1]).collect{|s| [s.name, s.id.to_s] } }
-                         }
-
   def index
+
     get_query
     
     if @user_synthesis.nil?
@@ -57,15 +50,49 @@ class MyRoadmapsController < ApplicationController
     }
 
     # condition hacked from the Query model to match versions
-    condition = '(versions.status <> \'closed\')'
-    condition += ' and '+@query.statement_for('project_id').sub('issues','versions') if @query.has_filter?('project_id')
+    version_condition = '(versions.status <> \'closed\')'
+    version_condition += ' and ('+@query.statement_for('project_id').sub('issues','versions')+' or exists (select 1 from issues where issues.fixed_version_id = versions.id and '+@query.statement_for('project_id')+'))' if @query.has_filter?('project_id')
 
-    Version.visible.find(:all, :conditions => [condition] ) \
+    Version.find(:all, :conditions => [version_condition] ) \
       .select{|version| !version.completed? } \
       .each{|version|
-        issues = Issue.visible.find(:all, :conditions => ['fixed_version_id = ? and tracker_id in (?)', version.id, @tracker_styles.keys]) \
+        affected_project_ids = [version.project.id]
+        case
+        when version.sharing == 'none'
+          # do nothing: the version is not shared
+        when version.sharing == 'descendants'
+          version.project.descendants.visible.each{|p|
+            affected_project_ids.push(p.id)
+          }
+        when version.sharing.member_of?(['hierarchy', 'tree'])
+          version.project.hierarchy.visible.each{|p|
+              affected_project_ids.push(p.id)
+            }
+        when version.sharing == 'system'
+          Projects.visible.each{|p|
+              affected_project_ids.push(p.id)
+            }
+        end
+        # list affected projects
+        issue_condition = @query.statement_for('project_id')+' and '+ \
+                           'tracker_id in (?) and '+ \
+                           '( fixed_version_id = ? '+ \
+                            'or exists (select 1 '+ \
+                              'from issues as subissues '+ \
+                              'where issues.root_id = subissues.root_id '+ \
+                              'and subissues.fixed_version_id = ?) )'
+        if User.current.admin?
+          issue_condition = [issue_condition,
+                             @tracker_styles.keys, version.id, version.id]
+        else
+          issue_condition = [issue_condition + \
+                              'and (assigned_to_id is null or assigned_to_id = ?)',
+                             @tracker_styles.keys, version.id, version.id, User.current.id ]
+        end
+
+        issues = Issue.visible.find(:all, :conditions => issue_condition ) \
         .select{|iss|
-          (iss.root_id == iss.id || Issue.find(:all, :conditions => ['root_id = ? and fixed_version_id = ?', iss.root_id, version.id]).length>0)
+          (( iss.fixed_version_id == version.id && iss.root_id == iss.id) || Issue.find(:all, :conditions => ['root_id = ? and fixed_version_id = ?', iss.root_id, version.id]).length>0)
         }
       @user_synthesis[version] = VersionSynthesis.new(version, issues) if issues.length > 0
     }
@@ -84,7 +111,12 @@ class MyRoadmapsController < ApplicationController
   
   def get_query
     @query = Query.new(:name => "_", :filters => {})
-    @query.override_available_filters(@@filters)
+    user_projects = Project.visible
+    user_trackers = Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1])
+    filters = Hash.new
+    filters['project_id'] = { :type => :list_optional, :order => 1, :values => user_projects.sort{|a,b| a.self_and_ancestors.join('/')<=>b.self_and_ancestors.join('/') }.collect{|s| [s.self_and_ancestors.join('/'), s.id.to_s] } } unless user_projects.empty?
+    filters['tracker_id'] = { :type => :list, :order => 2, :values => Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1]).collect{|s| [s.name, s.id.to_s] } } unless user_trackers.empty?
+    @query.override_available_filters(filters)
     if params[:f]
       build_query_from_params
     end
