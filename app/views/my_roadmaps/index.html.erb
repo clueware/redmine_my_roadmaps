@@ -37,15 +37,15 @@
 		@user_synthesis.sort{|a,b| [a[0].project.name.upcase, splitVersionName(a[0].name)]<=>[b[0].project.name.upcase, splitVersionName(b[0].name)]}.each { |version,synthesis|
 		if prevProjectId.nil? || prevProjectId!=version.project.id
 			prevProjectId=version.project.id
-			%><h2 class="project"><%= link_to version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id} %></h2><%
+			%><h2 class="project"><%= link_to_if(version.project.visible?(User.current),version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id}) %></h2><%
 		end
 		%>
 		<h3 class="version">
-			<%= link_to version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id} %> -  
-			<%= link_to version.name, {:controller => 'versions', :action => 'show', :id => version.id} %>
+			<%= link_to_if(version.project.visible?(User.current),version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id}) %> -  
+			<%= link_to_if(version.visible?(User.current),version.name, {:controller => 'versions', :action => 'show', :id => version.id}) %>
 			<span style="font-size:0.7em;">
 				<%= "("+l(:version_status_locked)+")" if version.status == 'locked' %>
-				<%= link_to l(:button_edit), {:controller => 'versions', :action => 'edit', :id => version.id} %>
+				<%= link_to l(:button_edit), {:controller => 'versions', :action => 'edit', :id => version.id} if version.visible?(User.current) %>
 			</span>
 		</h3>
 		
