@@ -1,0 +1,12 @@
+# Chinese strings goes here, courtesy of https://github.com/archonwang
+my_roadmaps_name: 我的路线图
+permission_view_my_roadmaps: 查看我的路线图
+label_x_closed_issue_not_shown:
+  zero: " (0 个已关闭问题未显示)"
+  one: " (1 个已关闭问题未显示)"
+  other: " (%{count} 个已关闭问题未显示)"
+label_for_root_issues: 
+  zero: "(FIXME for lang/zh.yml)"
+  one: "(%{pct}% FIXME for lang/zh.yml)"
+  other: "(%{pct}% %{count} FIXME for lang/zh.yml)"
+button_refresh: 刷新
