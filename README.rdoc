@@ -6,4 +6,4 @@ All your comments are greatly welcome: this is my first attempt at Ruby, Rails a
 
 It is licensed under the GPL v2. See http://www.gnu.org/licenses/old-licenses/gpl-2.0.html for further details.
 
-Here's a screenshot: {<img src="https://github.com/clueware/redmine_my_roadmaps/raw/master/assets/screenshot/latest_screenshot.png" />}
+Here's a screenshot: https://github.com/clueware/redmine_my_roadmaps/raw/master/assets/screenshot/latest_screenshot.png
