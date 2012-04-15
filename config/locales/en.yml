@@ -24,4 +24,8 @@ en:
     zero: " (0 closed issue not shown)"
     one: " (1 closed issue not shown)"
     other: " (%{count} closed issues not shown)"
+  label_for_root_issues: 
+    zero: "(no root issue)"
+    one: "(%{pct}% for root issue)"
+    other: "(%{pct}% for %{count} root issues)"
   button_refresh: Refresh

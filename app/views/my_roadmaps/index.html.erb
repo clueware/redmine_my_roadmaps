@@ -53,29 +53,30 @@
 			trackers = synthesis.trackers
 			trackers.sort{|a,b| a.wrapped_tracker.name<=>b.wrapped_tracker.name}.each{ |tracker_wrapper|
 				tracker = tracker_wrapper.wrapped_tracker
-				done_overall_pct = tracker_wrapper.overall_done_pct.round
-				opened_left_pct = 100-done_overall_pct
+				opened_left_pct = 100-tracker_wrapper.overall_done_pct.round
 				closed_tracker_style = @tracker_styles[tracker][:closed]
 				done_tracker_style = @tracker_styles[tracker][:done]
 				opened_tracker_style = @tracker_styles[tracker][:opened]
 		%>
 		<table class="progress" style="width: 40%; height: 1em;">
 			<tr>
-				<% unless tracker_wrapper.closed_nb == 0 %>
+				<% if tracker_wrapper.closed_nb.round > 0 %>
 					<td class="<%= closed_tracker_style %>" 
-						style="width:<%= tracker_wrapper.overall_closed_pct.round %>%"></td>
+						style="width:<%= tracker_wrapper.closed_pct.round %>%"></td>
 				<% end
-				   if tracker_wrapper.done_nb > 0 %>
+				   if (tracker_wrapper.overall_done_pct-tracker_wrapper.closed_pct).round > 0 %>
 					<td class="<%= done_tracker_style %>" 
-						style="width:<%= (tracker_wrapper.overall_done_pct-tracker_wrapper.overall_closed_pct).round %>%"></td>
+						style="width:<%= (tracker_wrapper.overall_done_pct-tracker_wrapper.closed_pct).round %>%"></td>
 				<% end
-				   if opened_left_pct.round>0 %>
+				   if opened_left_pct.round > 0 %>
 					<td class="<%= opened_tracker_style %>" 
 						style="width:<%= opened_left_pct.round %>%"></td>
 				<% end %>
 			</tr>
 		</table>
-		<p class="pourcent"><%= tracker.name+" "+done_overall_pct.to_s %>%</p>
+		<p class="pourcent">
+			<%= tracker.name+" "+(tracker_wrapper.overall_done_pct).round.to_s %>%
+			<%=l(:label_for_root_issues, :count => tracker_wrapper.total_root_nb.round, :pct => (tracker_wrapper.overall_root_done_pct).round ) unless (tracker_wrapper.total_root_nb == tracker_wrapper.total_nb) %></p>
 		<p class="progress-info"><%= link_to_if(tracker_wrapper.closed_nb > 0, 
 					l(:label_x_closed_issues_abbr, :count => tracker_wrapper.closed_nb), 
 					:controller => 'issues', 
@@ -85,7 +86,7 @@
 					:status_id => 'c', 
 					:fixed_version_id => version, 
 					:set_filter => 1) +
-				"("+tracker_wrapper.closed_pct.to_s+"%) "+ 
+				"("+tracker_wrapper.closed_pct.round.to_s+"%) "+ 
 				link_to_if(tracker_wrapper.opened_nb > 0, 
 					l(:label_x_open_issues_abbr, :count => tracker_wrapper.opened_nb), 
 					:controller => 'issues', 
@@ -95,7 +96,7 @@
 					:status_id => 'o', 
 					:fixed_version_id => version, 
 					:set_filter => 1)+ 
-				"("+tracker_wrapper.opened_pct.to_s+"%)" %></p>
+				"("+tracker_wrapper.opened_pct.round.to_s+"%)" %></p>
 		<%
 			}
 		%>

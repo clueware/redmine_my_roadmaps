@@ -39,7 +39,13 @@ class TrackerWrapper
     @closed_root_nb = 0
     # % of closed root issues
     @closed_root_pct = 0
+    # number of root issues presenting a completion ratio > 0, excluding closed ones
+    @done_root_nb = 0
+    # average completion of the @done_root_nb issues
+    @done_root_pct = 0.0
 
+    # @done_root_pct accumulator 
+    @sum_done_root_pct = 0
     # @done_pct accumulator 
     @sum_done_pct = 0
   end
@@ -48,41 +54,72 @@ class TrackerWrapper
   def addIssue(issue)
     @total_nb += 1
     
+    # global stats
     @closed_nb += 1 if issue.closed?
+    if issue.done_ratio > 0 && !issue.closed?
+      @sum_done_pct += issue.done_ratio 
+      @done_nb += 1
+    end
+    
+    # root issues stats
     if issue.root_id == issue.id
       @closed_root_nb += 1 if issue.closed?
       @total_root_nb += 1
       if issue.done_ratio > 0 && !issue.closed?
-        @sum_done_pct += issue.done_ratio 
-        @done_nb += 1
+        @sum_done_root_pct += issue.done_ratio 
+        @done_root_nb += 1
       end
     end
+    
     if @done_nb>0
-      @done_pct = @sum_done_pct.to_f/@done_nb
+      @done_pct = (@closed_pct.to_f+@sum_done_pct.to_f)/@done_nb.to_f
+    else
+      @done_pct = 0
+    end
+    
+    if @done_root_nb>0
+      @done_root_pct = @sum_done_root_pct.to_f/@done_root_nb.to_f
+    else
+      @done_root_pct = 0
     end
 
     @opened_nb = @total_nb - @closed_nb
-    @closed_pct = @closed_nb*100/@total_nb
-    @closed_root_pct = @closed_root_nb*100/@total_root_nb unless @total_root_nb == 0
-    @opened_pct = @opened_nb*100/@total_nb
+    if @total_nb>0
+      @closed_pct = @closed_nb.to_f*100.0/@total_nb.to_f
+      @opened_pct = @opened_nb.to_f*100.0/@total_nb.to_f
+    else
+      @closed_pct = 0
+      @opened_pct = 0
+    end
+    
+    if @total_root_nb>0
+      @closed_root_pct = @closed_root_nb.to_f*100.0/@total_root_nb.to_f unless @total_root_nb == 0
+    else
+      @closed_root_pct = 0
+    end
   end
   
-  # returns the overall done %, taking into account closed issues and % done
-  def overall_done_pct
+  # returns the overall root issues done %, taking into account closed root issues and % done
+  def overall_root_done_pct
+    if @total_root_nb == 0
       result = 0
-    if @total_root_nb>0
-      result = ((@closed_root_nb.to_f+(@done_nb.to_f*@done_pct.to_f/100.0))/@total_root_nb)*100
+    else 
+      result = ((@closed_root_nb.to_f+(@done_root_nb.to_f*@done_root_pct.to_f/100.0))/@total_root_nb)*100
     end
     return result
   end
   
-  # returns the overall close %, taking into account sub-issues
-  def overall_closed_pct
-    closed_subissues_nb = @closed_nb - @closed_root_nb
-    closed_subissues_pct = 0
-    closed_subissues_pct = @closed_pct * closed_subissues_nb / @total_nb unless @total_nb == 0
-    return closed_subissues_pct+@closed_root_pct 
+  # returns the overall done %, taking into account closed issues and % done
+  def overall_done_pct
+    if @total_nb == 0
+      result = 0
+    else 
+      result = ((@closed_nb.to_f+(@done_nb.to_f*@done_pct.to_f/100.0))/@total_nb)*100
+    end
+    return result
   end
   
-  attr_reader :wrapped_tracker, :total_nb, :total_root_nb, :closed_nb, :closed_root_nb, :done_nb, :done_pct, :opened_nb, :closed_pct, :closed_root_pct, :opened_pct
+  attr_reader :wrapped_tracker, :total_nb, :total_root_nb
+  attr_reader :closed_nb, :closed_root_nb, :done_root_nb, :done_nb, :opened_nb 
+  attr_reader :closed_pct, :closed_root_pct, :done_root_pct, :done_pct, :opened_pct
 end

@@ -23,4 +23,8 @@ label_x_closed_issue_not_shown:
   zero: " (0 demande fermée non incluse)"
   one: " (1 demande fermée non incluse)"
   other: " (%{count} demandes fermées non incluses)"
+label_for_root_issues: 
+  zero: "(pas de demande racine)"
+  one: "(%{pct}% pour la demande racine)"
+  other: "(%{pct}% pour les %{count} demandes racines)"
 button_refresh: Rafraichir
