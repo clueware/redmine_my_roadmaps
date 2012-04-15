@@ -51,7 +51,7 @@
 		
 		<% 
 			trackers = synthesis.trackers
-			trackers.sort{|a,b| a.wrapped_tracker.name<=>b.wrapped_tracker.name}.each{ |tracker_wrapper|
+			trackers.sort{|a,b| a.wrapped_tracker.position<=>b.wrapped_tracker.position}.each{ |tracker_wrapper|
 				tracker = tracker_wrapper.wrapped_tracker
 				opened_left_pct = 100-tracker_wrapper.overall_done_pct.round
 				closed_tracker_style = @tracker_styles[tracker][:closed]
