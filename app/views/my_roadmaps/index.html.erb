@@ -155,8 +155,7 @@
 						<%= issue.done_ratio%>%
 					</td>
 	      		<% else %>
-					<td colspan="<%= issue.done_ratio/10 %>" class="<%= @tracker_styles[issue.tracker][:done] %><%= child_issue %>" 
-					style="white-space: nowrap; overflow: visible;">
+					<td colspan="<%= issue.done_ratio/10 %>" class="<%= @tracker_styles[issue.tracker][:done] %><%= child_issue %>">
 						<div style="<%= issue_div_style %>">
 							<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
 						</div>

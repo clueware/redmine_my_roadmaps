@@ -9,7 +9,7 @@ table.tracker tr td {
 	text-align: right;
 }
 table.tracker tr td div {
-	position: absolute;
+	text-align: left;
 }
 
 td.childissue div {
