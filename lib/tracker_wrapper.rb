@@ -23,7 +23,7 @@ class TrackerWrapper
     @total_nb = 0
     # closed issue number
     @closed_nb = 0
-    # number of issues presenting a completion ratio > 0, excluding closed one
+    # number of issues presenting a completion ratio > 0, excluding closed ones
     @done_nb = 0
     # average completion of the @done_nb issues
     @done_pct = 0.0
