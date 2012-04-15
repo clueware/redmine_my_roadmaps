@@ -63,11 +63,11 @@
 			<tr>
 				<% unless tracker_wrapper.closed_nb == 0 %>
 					<td class="<%= closed_tracker_style %>" 
-						style="width:<%= tracker_wrapper.closed_pct.round %>%"></td>
+						style="width:<%= tracker_wrapper.overall_closed_pct.round %>%"></td>
 				<% end
 				   if tracker_wrapper.done_nb > 0 %>
 					<td class="<%= done_tracker_style %>" 
-						style="width:<%= (tracker_wrapper.done_pct/tracker_wrapper.total_root_nb).round %>%"></td>
+						style="width:<%= (tracker_wrapper.overall_done_pct-tracker_wrapper.overall_closed_pct).round %>%"></td>
 				<% end
 				   if opened_left_pct.round>0 %>
 					<td class="<%= opened_tracker_style %>" 
