@@ -34,20 +34,11 @@ class MyRoadmapsController < ApplicationController
       @user_synthesis.clear
     end
     
-    @tracker_styles = Hash.new
     if @query.has_filter?('tracker_id')
       tracker_list = Tracker.find(:all, :conditions => [@query.statement_for('tracker_id').sub('issues.tracker_id','trackers.id')], :order => 'position')
     else 
       tracker_list = Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1], :order => 'position')
     end
-    index=0
-    tracker_list.each{ |tracker|
-      @tracker_styles[tracker]=Hash.new
-      @tracker_styles[tracker][:opened] = "t"+(index%10).to_s+"_opened"
-      @tracker_styles[tracker][:done] = "t"+(index%10).to_s+"_done"
-      @tracker_styles[tracker][:closed] = "t"+(index%10).to_s+"_closed"
-      index += 1
-    }
 
     # condition hacked from the Query model to match versions
     version_condition = '(versions.status <> \'closed\')'
@@ -83,11 +74,11 @@ class MyRoadmapsController < ApplicationController
                               'and subissues.fixed_version_id = ?) )'
         if User.current.admin?
           issue_condition = [issue_condition,
-                             @tracker_styles.keys, version.id, version.id]
+                             tracker_list, version.id, version.id]
         else
           issue_condition = [issue_condition + \
                               'and (assigned_to_id is null or assigned_to_id = ?)',
-                             @tracker_styles.keys, version.id, version.id, User.current.id ]
+                             tracker_list, version.id, version.id, User.current.id ]
         end
 
         issues = Issue.visible.find(:all, :conditions => issue_condition ) \
@@ -98,6 +89,17 @@ class MyRoadmapsController < ApplicationController
     }
   end
   
+  def initialize
+    index=0
+    @tracker_styles = Hash.new
+    Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1], :order => 'position' ).each{ |tracker|
+      @tracker_styles[tracker]=Hash.new
+      @tracker_styles[tracker][:opened] = "t"+(index%10).to_s+"_opened"
+      @tracker_styles[tracker][:done] = "t"+(index%10).to_s+"_done"
+      @tracker_styles[tracker][:closed] = "t"+(index%10).to_s+"_closed"
+      index += 1
+    }
+  end
   
   private
   
