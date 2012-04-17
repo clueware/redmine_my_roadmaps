@@ -42,7 +42,7 @@ class MyRoadmapsController < ApplicationController
 
     # condition hacked from the Query model to match versions
     version_condition = '(versions.status <> \'closed\')'
-    version_condition += ' and ('+@query.statement_for('project_id').sub('issues','versions')+' or exists (select 1 from issues where issues.fixed_version_id = versions.id and '+@query.statement_for('project_id')+'))' if @query.has_filter?('project_id')
+    version_condition += ' and ('+@query.statement_for('project_id').gsub('issues','versions')+' or exists (select 1 from issues where issues.fixed_version_id = versions.id and '+@query.statement_for('project_id')+'))' if @query.has_filter?('project_id')
 
     Version.find(:all, :conditions => [version_condition] ) \
       .select{|version| !version.completed? } \
