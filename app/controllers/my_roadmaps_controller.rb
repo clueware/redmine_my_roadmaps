@@ -55,7 +55,7 @@ class MyRoadmapsController < ApplicationController
           version.project.descendants.visible.each{|p|
             affected_project_ids.push(p.id)
           }
-        when version.sharing.member_of?(['hierarchy', 'tree'])
+        when (version.sharing == 'hierarchy') || (version.sharing ==  'tree')
           version.project.hierarchy.visible.each{|p|
               affected_project_ids.push(p.id)
             }
