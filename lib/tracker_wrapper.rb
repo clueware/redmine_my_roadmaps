@@ -56,7 +56,7 @@ class TrackerWrapper
     
     # global stats
     @closed_nb += 1 if issue.closed?
-    if issue.done_ratio > 0 && !issue.closed?
+    if issue.done_ratio > 0 && !issue.closed? && issue.leaf?
       @sum_done_pct += issue.done_ratio 
       @done_nb += 1
     end
@@ -72,7 +72,7 @@ class TrackerWrapper
     end
     
     if @done_nb>0
-      @done_pct = (@closed_pct.to_f+@sum_done_pct.to_f)/@done_nb.to_f
+      @done_pct = @sum_done_pct.to_f/@done_nb.to_f
     else
       @done_pct = 0
     end
