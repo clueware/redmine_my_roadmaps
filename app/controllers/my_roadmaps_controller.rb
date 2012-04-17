@@ -36,9 +36,9 @@ class MyRoadmapsController < ApplicationController
     
     @tracker_styles = Hash.new
     if @query.has_filter?('tracker_id')
-      tracker_list = Tracker.find(:all, :conditions => [@query.statement_for('tracker_id').sub('issues.tracker_id','trackers.id')]).sort!{ |a,b| a.id<=>b.id }
+      tracker_list = Tracker.find(:all, :conditions => [@query.statement_for('tracker_id').sub('issues.tracker_id','trackers.id')], :order => 'position')
     else 
-      tracker_list = Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1]).sort!{ |a,b| a.id<=>b.id }
+      tracker_list = Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1], :order => 'position')
     end
     index=0
     tracker_list.each{ |tracker|
@@ -115,7 +115,7 @@ class MyRoadmapsController < ApplicationController
     user_trackers = Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1])
     filters = Hash.new
     filters['project_id'] = { :type => :list_optional, :order => 1, :values => user_projects.sort{|a,b| a.self_and_ancestors.join('/')<=>b.self_and_ancestors.join('/') }.collect{|s| [s.self_and_ancestors.join('/'), s.id.to_s] } } unless user_projects.empty?
-    filters['tracker_id'] = { :type => :list, :order => 2, :values => Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1]).collect{|s| [s.name, s.id.to_s] } } unless user_trackers.empty?
+    filters['tracker_id'] = { :type => :list, :order => 2, :values => Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1], :order => 'position' ).collect{|s| [s.name, s.id.to_s] } } unless user_trackers.empty?
     @query.override_available_filters(filters)
     if params[:f]
       build_query_from_params
