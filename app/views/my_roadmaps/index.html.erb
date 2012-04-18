@@ -110,7 +110,19 @@
 		  </caption>
 	  	  <tr style="height: 5px; padding: 0px; margin:0px;">
 	  	  	<td style="width: 5px;"/>
-	  	  	<% 10.times {%><td style="width: 10%;"/><%}%>
+			<%
+			  	pct_done = issues.map{|issue_wrapper| (issue_wrapper.wrapped_issue.closed?)?100:issue_wrapper.wrapped_issue.done_ratio}
+			  	pct_done.push(0,100)
+			  	pct_done.uniq!
+			  	pct_done.sort!
+			  	# when all issues are either not started or closed
+			  	pct_done = [0,90,100] if pct_done.length==2
+			  	pct_done.each_index{|i|
+			  		if i>0
+				  		%><td style="width: <%=pct_done[i]-pct_done[i-1]%>%;"/><%
+			  		end
+			  	}
+			%>
 	  	  	<td style="width: 5px;"/>
 	  	  </tr>
 		  <% 
@@ -127,19 +139,22 @@
 		  	 %>
 		    <tr>
 		      <td/>
-		      <% firstcolspan=9
-		      	 secondcolspan=1
+		      <% target_ratio = (issue.closed?)?100:issue.done_ratio
+		      	 if [0,100].include?(target_ratio)
+			      	 firstcolspan = pct_done.length-2
+			      	 secondcolspan = 1
+		      	 else
+			      	 firstcolspan = pct_done.index(target_ratio)
+			      	 secondcolspan = pct_done.length-firstcolspan-1
+		      	 end
 		      	 if issue.closed?
 		      	 	secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:closed]+child_issue
 		      	 else
 		      	 	if (issue.done_ratio/10)==0
 			      	 	secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:opened]+child_issue
 		      	 	elsif (issue.done_ratio/10)==10
-		      	 		secondcolspan = (10-(issue.done_ratio/10))
 			      	 	secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:done]+child_issue
 		      	 	else
-		      	 		firstcolspan = issue.done_ratio/10
-		      	 		secondcolspan = (10-(issue.done_ratio/10))
 			      	 	firsttdclass = @tracker_styles[issue.tracker][:done]+child_issue
 			      	 	secondtdclass = @tracker_styles[issue.tracker][:opened]+child_issue
 		      	 	end
