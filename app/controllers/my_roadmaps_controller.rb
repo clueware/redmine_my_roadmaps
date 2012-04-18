@@ -60,7 +60,7 @@ class MyRoadmapsController < ApplicationController
               affected_project_ids.push(p.id)
             }
         when version.sharing == 'system'
-          Projects.visible.each{|p|
+          Project.visible.each{|p|
               affected_project_ids.push(p.id)
             }
         end
