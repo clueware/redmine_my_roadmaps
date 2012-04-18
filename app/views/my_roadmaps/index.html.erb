@@ -114,8 +114,7 @@
 	  	  	<td style="width: 5px;"/>
 	  	  </tr>
 		  <% 
-		  	issues.reject{ |issue_wrapper| issue_wrapper.wrapped_issue.closed? unless !@exclude_closed_issues } \
-		  		.sort_by{ |a| [a.wrapped_issue.root_id, ((a.wrapped_issue.leaf?)?(a.wrapped_issue.parent_id):(a.wrapped_issue.id)), a.depth, a.wrapped_issue.tracker.position, a.wrapped_issue.id]} \
+		  	issues.sort_by{ |a| [a.wrapped_issue.root_id, ((a.wrapped_issue.leaf?)?(a.wrapped_issue.parent_id):(a.wrapped_issue.id)), a.depth, a.wrapped_issue.tracker.position, a.wrapped_issue.id]} \
 		  		.each { |issue_wrapper| 
 		  	issue = issue_wrapper.wrapped_issue 
 		  	if issue_wrapper.depth >0
