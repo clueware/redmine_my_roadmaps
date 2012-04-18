@@ -7,9 +7,12 @@ h2.project {
 table.tracker tr td {
 	white-space: nowrap; 
 	text-align: right;
+	overflow: visible;
 }
 table.tracker tr td div {
+	position: absolute;
 	text-align: left;
+	left: 1.5em;
 }
 
 td.childissue div {
