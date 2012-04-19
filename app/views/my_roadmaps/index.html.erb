@@ -106,7 +106,7 @@
 		  <table class="list tracker" style="width: 70%; font-size: 90%;">
 		  <caption>
 		  	<%= l(:label_related_issues) %>
-		  	<%= l(:label_x_closed_issue_not_shown, :count => synthesis.closed_nb) unless !@exclude_closed_issues || synthesis.closed_nb==0 %>
+		  	<%= l(:label_x_closed_issue_not_shown, :count => synthesis.closed_nb) unless synthesis.closed_nb==0 %>
 		  </caption>
 	  	  <tr style="height: 5px; padding: 0px; margin:0px;">
 	  	  	<td style="width: 5px;"/>
