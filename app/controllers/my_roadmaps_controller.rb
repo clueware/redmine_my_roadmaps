@@ -87,6 +87,7 @@ class MyRoadmapsController < ApplicationController
         }
       @user_synthesis[version] = VersionSynthesis.new(version, issues) if issues.length > 0
     }
+    @user_synthesis = @user_synthesis.sort{|a,b| [a[0].project.name.upcase, splitVersionName(a[0].name)]<=>[b[0].project.name.upcase, splitVersionName(b[0].name)]}
   end
   
   def initialize
@@ -123,5 +124,14 @@ class MyRoadmapsController < ApplicationController
       build_query_from_params
     end
     @query.filters={ 'project_id' => {:operator => "*", :values => [""]} } if @query.filters.length==0
+  end
+
+  # splits a version name into its constituents, returning an array.
+  # Numeric values are converted to a string on 10 positions to ease comparison
+  # with non-numeric strings
+  def splitVersionName(versionName)
+    return versionName.split(/[^a-zA-Z0-9]/).compact.map{ |elem|
+      (elem.to_i.to_s!=elem)?(elem.to_s):('%010d' % elem.to_i)
+     }
   end
 end

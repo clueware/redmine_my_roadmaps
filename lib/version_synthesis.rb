@@ -38,6 +38,10 @@ class VersionSynthesis
         @max_depth = depth
       end
     }
+
+    @issues = @issues.sort_by{ |a| [a.wrapped_issue.root_id, ((a.wrapped_issue.leaf?)?(a.wrapped_issue.parent_id):(a.wrapped_issue.id)), a.depth, a.wrapped_issue.tracker.position, a.wrapped_issue.id]}
+    @trackers.sort{|a,b| a.wrapped_tracker.position<=>b.wrapped_tracker.position}
+
     @done_pct = 0
     @done_nb = 0
     @total_nb = 0
@@ -59,8 +63,20 @@ class VersionSynthesis
       @closed_pct = @closed_nb*100/@total_nb
       @opened_pct = @opened_nb*100/@total_nb
     end
-    @trackers.sort{|a,b| a.wrapped_tracker.position<=>b.wrapped_tracker.position}
+    
+    
+    # issues progress % set
+    if !@issues.nil? && @issues.length > 0
+      @pct_done = @issues.map{|issue_wrapper| (issue_wrapper.wrapped_issue.closed?)?100:issue_wrapper.wrapped_issue.done_ratio}
+      @pct_done.push(0,100)
+      @pct_done.uniq!
+      @pct_done.sort!
+      # when all issues are either not started or closed
+      @pct_done = [0,90,100] if pct_done.length==2
+    else
+      @pct_done = nil
+    end
   end
 
-  attr_reader :version, :project, :max_depth, :issues, :trackers, :done_nb, :done_pct, :closed_nb, :closed_pct, :opened_nb, :opened_pct
+  attr_reader :version, :project, :max_depth, :issues, :trackers, :pct_done, :done_nb, :done_pct, :closed_nb, :closed_pct, :opened_nb, :opened_pct
 end

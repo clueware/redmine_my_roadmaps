@@ -1,0 +1,43 @@
+<% 	
+	issue = issue_wrapper.wrapped_issue
+	if issue_wrapper.depth >0
+		child_issue = " childissue"
+	  	issue_div_style = 'style="margin-left: '+((issue_wrapper.depth-1)*10).to_s+'px;"'
+	else
+		child_issue = ""
+	  	issue_div_style = ""
+	end
+  	target_ratio = (issue.closed?)?100:issue.done_ratio
+	if [0,100].include?(target_ratio)
+		firstcolspan = synthesis.pct_done.length-2
+		secondcolspan = 1
+	else
+		firstcolspan = synthesis.pct_done.index(target_ratio)
+		secondcolspan = synthesis.pct_done.length-firstcolspan-1
+	end
+	if issue.closed?
+		secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:closed]+child_issue
+		else
+		if issue.done_ratio==0
+			secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:opened]+child_issue
+		elsif issue.done_ratio==100
+			secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:done]+child_issue
+		else
+			firsttdclass = @tracker_styles[issue.tracker][:done]+child_issue
+			secondtdclass = @tracker_styles[issue.tracker][:opened]+child_issue
+		end
+	end
+%>
+<tr>
+	<td/>
+		<td <%="colspan=#{firstcolspan}" %> class="<%= 'tracker '+firsttdclass %>">
+			<div <%= issue_div_style %>>
+				<%= link_to_issue(issue, :project => (synthesis.project != issue.project)) %>
+			</div>
+		</td>
+		<td <%="colspan=#{secondcolspan}" if secondcolspan>1  %> class="<%= secondtdclass %>">
+			<%= (issue.closed?)?100:issue.done_ratio %>%
+		</td>
+	<td/>
+</tr>
+

@@ -19,13 +19,18 @@
 <%= render :partial => 'filters', :locals => {:query => @query} %>
 <h2><%= l(:my_roadmaps_name) %></h2>
 <div id="roadmaps">
-	<%  prevProjectId=nil
-		@user_synthesis.sort{|a,b| [a[0].project.name.upcase, splitVersionName(a[0].name)]<=>[b[0].project.name.upcase, splitVersionName(b[0].name)]}.each { |version,synthesis|
-		if prevProjectId.nil? || prevProjectId!=version.project.id
-			prevProjectId=version.project.id
-			%><h2 class="project"><%= link_to_if(version.project.visible?(User.current),version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id}) %></h2><%
-		end
-		%>
+	<%
+		prevProjectId=nil
+		@user_synthesis.each { |version,synthesis|
+			if prevProjectId.nil? || prevProjectId!=version.project.id
+				prevProjectId=version.project.id
+	%>
+				<h2 class="project">
+					<%= link_to_if(version.project.visible?(User.current),version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id}) %>
+				</h2>
+	<%
+			end
+	%>
 		<h3 class="version">
 			<%= link_to_if(version.project.visible?(User.current),version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id}) %> -  
 			<%= link_to_if(version.visible?(User.current),version.name, {:controller => 'versions', :action => 'show', :id => version.id}) %>
@@ -34,84 +39,39 @@
 				<%= link_to l(:button_edit), {:controller => 'versions', :action => 'edit', :id => version.id} if version.visible?(User.current) %>
 			</span>
 		</h3>
-
+		
 		<%= render :partial => 'trackers_progress', :locals => {:synthesis => synthesis} %>
-
-		<% issues = synthesis.issues
-		   if !issues.nil? && issues.length>0 
-			  	pct_done = issues.map{|issue_wrapper| (issue_wrapper.wrapped_issue.closed?)?100:issue_wrapper.wrapped_issue.done_ratio}
-			  	pct_done.push(0,100)
-			  	pct_done.uniq!
-			  	pct_done.sort!
-			  	# when all issues are either not started or closed
-			  	pct_done = [0,90,100] if pct_done.length==2
-		%>
-		  <table class="list tracker" style="width: 70%; font-size: 90%;">
-		  <caption>
-		  	<%= l(:label_related_issues) %>
-		  	<%= l(:label_x_closed_issue_not_shown, :count => synthesis.closed_nb) unless synthesis.closed_nb==0 %>
-		  </caption>
-	  	  <tr style="height: 5px; padding: 0px; margin:0px;">
-	  	  	<td style="width: 5px;"/>
-			<%
-			  	pct_done.each_index{|i|
-			  		if i>0
-				  		%><td style="width: <%=pct_done[i]-pct_done[i-1]%>%;"/><%
-			  		end
-			  	}
-			%>
-	  	  	<td style="width: 5px;"/>
-	  	  </tr>
-		  <% 
-		  	issues.sort_by{ |a| [a.wrapped_issue.root_id, ((a.wrapped_issue.leaf?)?(a.wrapped_issue.parent_id):(a.wrapped_issue.id)), a.depth, a.wrapped_issue.tracker.position, a.wrapped_issue.id]} \
-		  		.each { |issue_wrapper| 
-		  	issue = issue_wrapper.wrapped_issue 
-		  	if issue_wrapper.depth >0
-		  		child_issue = " childissue"
-			  	issue_div_style = 'style="margin-left: '+((issue_wrapper.depth-1)*10).to_s+'px;"'
-		  	else
-		  		child_issue = ""
-			  	issue_div_style = ""
-		  	end
-		  	 %>
-		    <tr>
-		      <td/>
-		      <% target_ratio = (issue.closed?)?100:issue.done_ratio
-		      	 if [0,100].include?(target_ratio)
-			      	 firstcolspan = pct_done.length-2
-			      	 secondcolspan = 1
-		      	 else
-			      	 firstcolspan = pct_done.index(target_ratio)
-			      	 secondcolspan = pct_done.length-firstcolspan-1
-		      	 end
-		      	 if issue.closed?
-		      	 	secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:closed]+child_issue
-		      	 else
-		      	 	if (issue.done_ratio/10)==0
-			      	 	secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:opened]+child_issue
-		      	 	elsif (issue.done_ratio/10)==10
-			      	 	secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:done]+child_issue
-		      	 	else
-			      	 	firsttdclass = @tracker_styles[issue.tracker][:done]+child_issue
-			      	 	secondtdclass = @tracker_styles[issue.tracker][:opened]+child_issue
-		      	 	end
-		      	 end
-		      %>
-			 <td <%="colspan=#{firstcolspan}" %> class="<%= 'tracker '+firsttdclass %>">
-				<div <%= issue_div_style %>>
-					<%= link_to_issue(issue, :project => (version.project != issue.project)) %>
-				</div>
-			 </td>
-			 <td <%="colspan=#{secondcolspan}" if secondcolspan>1  %> class="<%= secondtdclass %>">
-				<%= (issue.closed?)?100:issue.done_ratio %>%
-			 </td>
-		      <td/>
-		    </tr>
-		  <% } %>
-	  	  <tr style="height: 5px; padding: 0px; margin:0px;"><td colspan="12"/></tr>
-		  </table>
+		
+		<% if !synthesis.pct_done.nil? %>
+			<table class="list tracker" style="width: 70%; font-size: 90%;">
+				<caption>
+					<%= l(:label_related_issues) %>
+					<%= l(:label_x_closed_issue_not_shown, :count => synthesis.closed_nb) unless synthesis.closed_nb==0 %>
+				</caption>
+				<tr style="height: 5px; padding: 0px; margin:0px;">
+					<td style="width: 5px;"/>
+					<%
+						synthesis.pct_done.each_index{|i|
+						if i>0
+					%>
+						<td style="width: <%=synthesis.pct_done[i]-synthesis.pct_done[i-1]%>%;"/>
+					<%
+						end
+					}
+					%>
+					<td style="width: 5px;"/>
+				</tr>
+				<% 
+					synthesis.issues.each { |issue_wrapper|
+				%> 
+					<%= render :partial => 'related_issue', :locals => {:synthesis => synthesis, :issue_wrapper => issue_wrapper } %>
+				<% 
+					}
+				%>
+				<tr style="height: 5px; padding: 0px; margin:0px;"><td colspan="12"/></tr>
+			</table>
 		<% end %>
-	<p>
+		<p>
 	<% } %>
 	<h3><%= l(:my_roadmaps_no_version_match) if @user_synthesis.empty? %></h3>
 </div>

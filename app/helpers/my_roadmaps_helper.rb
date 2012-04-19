@@ -19,15 +19,6 @@ require_dependency 'query'
 
 module MyRoadmapsHelper
   
-  # splits a version name into its constituents, returning an array.
-  # Numeric values are converted to a string on 10 positions to ease comparison
-  # with non-numeric strings
-  def splitVersionName(versionName)
-    return versionName.split(/[^a-zA-Z0-9]/).compact.map{ |elem|
-      (elem.to_i.to_s!=elem)?(elem.to_s):('%010d' % elem.to_i)
-     }
-  end
-
   module QueryPatch
     def self.included(base)
       base.send(:include, InstanceMethods)
