@@ -34,15 +34,9 @@
 				<%= link_to l(:button_edit), {:controller => 'versions', :action => 'edit', :id => version.id} if version.visible?(User.current) %>
 			</span>
 		</h3>
-		
-		<% 
-			trackers = synthesis.trackers
-			trackers.sort{|a,b| a.wrapped_tracker.position<=>b.wrapped_tracker.position}.each{ |tracker_wrapper|
-		%>
-		<%= render :partial => 'trackers_progress', :locals => {:version => version, :tracker_wrapper => tracker_wrapper} %>
-		<%
-			}
-		%>
+
+		<%= render :partial => 'trackers_progress', :locals => {:synthesis => synthesis} %>
+
 		<% issues = synthesis.issues
 		   if !issues.nil? && issues.length>0 
 			  	pct_done = issues.map{|issue_wrapper| (issue_wrapper.wrapped_issue.closed?)?100:issue_wrapper.wrapped_issue.done_ratio}

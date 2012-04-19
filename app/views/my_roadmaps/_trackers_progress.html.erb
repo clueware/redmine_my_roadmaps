@@ -1,8 +1,10 @@
 <%
-	opened_left_pct = 100-tracker_wrapper.overall_done_pct.round
-	closed_tracker_style = @tracker_styles[tracker_wrapper.wrapped_tracker][:closed]
-	done_tracker_style = @tracker_styles[tracker_wrapper.wrapped_tracker][:done]
-	opened_tracker_style = @tracker_styles[tracker_wrapper.wrapped_tracker][:opened]
+	synthesis.trackers.each{ |tracker_wrapper|
+
+		opened_left_pct = 100-tracker_wrapper.overall_done_pct.round
+		closed_tracker_style = @tracker_styles[tracker_wrapper.wrapped_tracker][:closed]
+		done_tracker_style = @tracker_styles[tracker_wrapper.wrapped_tracker][:done]
+		opened_tracker_style = @tracker_styles[tracker_wrapper.wrapped_tracker][:opened]
 %>
 <table class="progress" style="width: 40%; height: 1em;">
 	<tr>
@@ -27,20 +29,21 @@
 			l(:label_x_closed_issues_abbr, :count => tracker_wrapper.closed_nb), 
 			:controller => 'issues', 
 			:action => 'index', 
-			:project_id => version.project, 
+			:project_id => synthesis.project, 
 			:tracker_id => tracker_wrapper.wrapped_tracker, 
 			:status_id => 'c', 
-			:fixed_version_id => version, 
+			:fixed_version_id => synthesis.version, 
 			:set_filter => 1) +
 		"("+tracker_wrapper.closed_pct.round.to_s+"%) "+ 
 		link_to_if(tracker_wrapper.opened_nb > 0, 
 			l(:label_x_open_issues_abbr, :count => tracker_wrapper.opened_nb), 
 			:controller => 'issues', 
 			:action => 'index', 
-			:project_id => version.project, 
+			:project_id => synthesis.project, 
 			:tracker_id => tracker_wrapper.wrapped_tracker, 
 			:status_id => 'o', 
-			:fixed_version_id => version, 
+			:fixed_version_id => synthesis.version, 
 			:set_filter => 1)+ 
 		"("+tracker_wrapper.opened_pct.round.to_s+"%)" %>
 </p>
+<%	} # synthesis.trackers.each %>

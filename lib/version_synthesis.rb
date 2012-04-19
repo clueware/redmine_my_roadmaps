@@ -17,8 +17,7 @@
 
 class VersionSynthesis
   def initialize(version, issues)
-    @id = version.id
-    @name = version.name
+    @version = version
     @project = version.project
     @issues = Array.new
 
@@ -60,7 +59,8 @@ class VersionSynthesis
       @closed_pct = @closed_nb*100/@total_nb
       @opened_pct = @opened_nb*100/@total_nb
     end
+    @trackers.sort{|a,b| a.wrapped_tracker.position<=>b.wrapped_tracker.position}
   end
 
-  attr_reader :id, :name, :project, :max_depth, :issues, :trackers, :done_nb, :done_pct, :closed_nb, :closed_pct, :opened_nb, :opened_pct
+  attr_reader :version, :project, :max_depth, :issues, :trackers, :done_nb, :done_pct, :closed_nb, :closed_pct, :opened_nb, :opened_pct
 end
