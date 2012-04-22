@@ -7,7 +7,7 @@ zh:
     one: " (1 个已关闭问题未显示)"
     other: " (%{count} 个已关闭问题未显示)"
   label_for_root_issues: 
-    zero: "(FIXME for config/locales/zh.yml)"
-    one: "(%{pct}% FIXME for config/locales/zh.yml)"
-    other: "(%{pct}% %{count} FIXME for config/locales/zh.yml)"
+    zero: "(no root issue)"
+    one: "(%{pct}% for root issue)"
+    other: "(%{pct}% for %{count} root issues)"
   button_refresh: 刷新
