@@ -64,10 +64,7 @@ class MyRoadmapsController < ApplicationController
                              tracker_list, version.id, version.id, User.current.id ]
         end
 
-        issues = Issue.visible.find(:all, :conditions => issue_condition ) \
-        .select{|iss|
-          (( iss.fixed_version_id == version.id && iss.root_id == iss.id) || Issue.find(:all, :conditions => ['root_id = ? and fixed_version_id = ?', iss.root_id, version.id]).length>0)
-        }
+        issues = Issue.visible.find(:all, :conditions => issue_condition )
       @user_synthesis[version] = VersionSynthesis.new(version, issues) if issues.length > 0
     }
     @user_synthesis = @user_synthesis.sort{|a,b| [a[0].project.name.upcase, splitVersionName(a[0].name)]<=>[b[0].project.name.upcase, splitVersionName(b[0].name)]}
