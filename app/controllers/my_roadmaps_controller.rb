@@ -47,23 +47,6 @@ class MyRoadmapsController < ApplicationController
     Version.find(:all, :conditions => [version_condition] ) \
       .select{|version| !version.completed? } \
       .each{|version|
-        affected_project_ids = [version.project.id]
-        case
-        when version.sharing == 'none'
-          # do nothing: the version is not shared
-        when version.sharing == 'descendants'
-          version.project.descendants.visible.each{|p|
-            affected_project_ids.push(p.id)
-          }
-        when (version.sharing == 'hierarchy') || (version.sharing ==  'tree')
-          version.project.hierarchy.visible.each{|p|
-              affected_project_ids.push(p.id)
-            }
-        when version.sharing == 'system'
-          Project.visible.each{|p|
-              affected_project_ids.push(p.id)
-            }
-        end
         # list affected projects
         issue_condition = @query.statement_for('project_id')+' and '+ \
                            'tracker_id in (?) and '+ \
