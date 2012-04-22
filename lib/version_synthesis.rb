@@ -16,14 +16,18 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 class VersionSynthesis
-  def initialize(version, issues)
+  def initialize(project, version, issues)
     @version = version
-    @project = version.project
+    @project = project
     @issues = Array.new
 
     @trackers = Array.new
     
     @max_depth=0
+    self.add_issues(issues)
+  end
+
+  def add_issues(issues)
     issues.each{ |issue|
       if @trackers.select{|wrapper| wrapper.wrapped_tracker == issue.tracker }.length!=1
         current_tracker = TrackerWrapper.new(version,issue.tracker) 
@@ -39,7 +43,6 @@ class VersionSynthesis
       end
     }
 
-    @issues = @issues.sort_by{ |a| [a.wrapped_issue.root_id, ((a.wrapped_issue.leaf?)?(a.wrapped_issue.parent_id):(a.wrapped_issue.id)), a.depth, a.wrapped_issue.tracker.position, a.wrapped_issue.id]}
     @trackers.sort{|a,b| a.wrapped_tracker.position<=>b.wrapped_tracker.position}
 
     @done_pct = 0
@@ -64,7 +67,6 @@ class VersionSynthesis
       @opened_pct = @opened_nb*100/@total_nb
     end
     
-    
     # issues progress % set
     if !@issues.nil? && @issues.length > 0
       @pct_done = @issues.map{|issue_wrapper| (issue_wrapper.wrapped_issue.closed?)?100:issue_wrapper.wrapped_issue.done_ratio}
@@ -77,6 +79,6 @@ class VersionSynthesis
       @pct_done = nil
     end
   end
-
+  
   attr_reader :version, :project, :max_depth, :issues, :trackers, :pct_done, :done_nb, :done_pct, :closed_nb, :closed_pct, :opened_nb, :opened_pct
 end

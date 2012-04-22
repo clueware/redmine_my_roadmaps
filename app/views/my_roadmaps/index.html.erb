@@ -20,58 +20,61 @@
 <h2><%= l(:my_roadmaps_name) %></h2>
 <div id="roadmaps">
 	<%
-		prevProjectId=nil
-		@user_synthesis.each { |version,synthesis|
-			if prevProjectId.nil? || prevProjectId!=version.project.id
-				prevProjectId=version.project.id
+		@user_synthesis.keys.sort_by{|project| project.self_and_ancestors.join('/') }.each{ |project|
 	%>
-				<h2 class="project">
-					<%= link_to_if(version.project.visible?(User.current),version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id}) %>
-				</h2>
-	<%
-			end
-	%>
-		<h3 class="version">
-			<%= link_to_if(version.project.visible?(User.current),version.project.name, {:controller => 'projects', :action => 'show', :id => version.project.id}) %> -  
-			<%= link_to_if(version.visible?(User.current),version.name, {:controller => 'versions', :action => 'show', :id => version.id}) %>
-			<span style="font-size:0.7em;">
-				<%= "("+l(:version_status_locked)+")" if version.status == 'locked' %>
-				<%= link_to l(:button_edit), {:controller => 'versions', :action => 'edit', :id => version.id} if version.visible?(User.current) %>
-			</span>
-		</h3>
-		
-		<%= render :partial => 'trackers_progress', :locals => {:synthesis => synthesis} %>
-		
-		<% if !synthesis.pct_done.nil? %>
-			<table class="list tracker" style="width: 70%; font-size: 90%;">
-				<caption>
-					<%= l(:label_related_issues) %>
-					<%= l(:label_x_closed_issue_not_shown, :count => synthesis.closed_nb) unless synthesis.closed_nb==0 %>
-				</caption>
-				<tr style="height: 5px; padding: 0px; margin:0px;">
-					<td style="width: 5px;"/>
-					<%
-						synthesis.pct_done.each_index{|i|
-						if i>0
+		<h2 class="project">
+			<%= link_to_if(project.visible?(User.current),project.name, {:controller => 'projects', :action => 'show', :id => project.id}) %>
+		</h2>
+		<%
+			@user_synthesis[project].keys.sort{|v1,v2| v1.splitted_version_name<=>v2.splitted_version_name}.each{ |version|
+				synthesis = @user_synthesis[project][version]
+		%>
+			<h3 class="version">
+				<%= link_to_if(project.visible?(User.current),project.name, {:controller => 'projects', :action => 'show', :id => project.id}) %> -  
+				<%= link_to_if(version.visible?(User.current),version.name, {:controller => 'versions', :action => 'show', :id => version.id}) %>
+				<span style="font-size:0.7em;">
+					<%= "("+l(:version_status_locked)+")" if version.status == 'locked' %>
+					<%= link_to l(:button_edit), {:controller => 'versions', :action => 'edit', :id => version.id} if version.visible?(User.current) %>
+				</span>
+			</h3>
+			
+			<%= render :partial => 'trackers_progress', :locals => {:synthesis => synthesis} %>
+			
+			<% if !synthesis.pct_done.nil? %>
+				<table class="list tracker" style="width: 70%; font-size: 90%;">
+					<caption>
+						<%= l(:label_related_issues) %>
+						<%= l(:label_x_closed_issue_not_shown, :count => synthesis.closed_nb) unless synthesis.closed_nb==0 %>
+					</caption>
+					<tr style="height: 5px; padding: 0px; margin:0px;">
+						<td style="width: 5px;"/>
+						<%
+							synthesis.pct_done.each_index{|i|
+							if i>0
+						%>
+							<td style="width: <%=synthesis.pct_done[i]-synthesis.pct_done[i-1]%>%;"/>
+						<%
+							end
+						}
+						%>
+						<td style="width: 5px;"/>
+					</tr>
+					<% 
+						synthesis.issues.sort_by{ |a| [a.wrapped_issue.root_id, \
+								((a.wrapped_issue.leaf?)?(a.wrapped_issue.parent_id):(a.wrapped_issue.id)),
+								a.depth,
+								a.wrapped_issue.tracker.position,
+								a.wrapped_issue.id]}.each { |issue_wrapper|
+					%> 
+						<%= render :partial => 'related_issue', :locals => {:synthesis => synthesis, :issue_wrapper => issue_wrapper } %>
+					<% 
+						}
 					%>
-						<td style="width: <%=synthesis.pct_done[i]-synthesis.pct_done[i-1]%>%;"/>
-					<%
-						end
-					}
-					%>
-					<td style="width: 5px;"/>
-				</tr>
-				<% 
-					synthesis.issues.each { |issue_wrapper|
-				%> 
-					<%= render :partial => 'related_issue', :locals => {:synthesis => synthesis, :issue_wrapper => issue_wrapper } %>
-				<% 
-					}
-				%>
-				<tr style="height: 5px; padding: 0px; margin:0px;"><td colspan="12"/></tr>
-			</table>
-		<% end %>
-		<p>
-	<% } %>
+					<tr style="height: 5px; padding: 0px; margin:0px;"><td colspan="12"/></tr>
+				</table>
+			<% end %>
+			<p>
+		<% } # version %>
+	<% } # project %>
 	<h3><%= l(:my_roadmaps_no_version_match) if @user_synthesis.empty? %></h3>
 </div>

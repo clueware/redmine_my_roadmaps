@@ -23,17 +23,12 @@ class MyRoadmapsController < ApplicationController
 
   helper :queries
   include QueriesHelper
-  
   def index
 
     get_query
-    
-    if @user_synthesis.nil?
-      @user_synthesis = Hash.new
-    else
-      @user_synthesis.clear
-    end
-    
+
+    @user_synthesis = Hash.new
+
     if @query.has_filter?('tracker_id')
       tracker_list = Tracker.find(:all, :conditions => [@query.statement_for('tracker_id').sub('issues.tracker_id','trackers.id')], :order => 'position')
     else 
@@ -45,49 +40,46 @@ class MyRoadmapsController < ApplicationController
     version_condition += ' and ('+@query.statement_for('project_id').gsub('issues','versions')+' or exists (select 1 from issues where issues.fixed_version_id = versions.id and '+@query.statement_for('project_id')+'))' if @query.has_filter?('project_id')
 
     Version.find(:all, :conditions => [version_condition] ) \
-      .select{|version| !version.completed? } \
-      .each{|version|
-        affected_project_ids = [version.project.id]
-        case
-        when version.sharing == 'none'
-          # do nothing: the version is not shared
-        when version.sharing == 'descendants'
-          version.project.descendants.visible.each{|p|
-            affected_project_ids.push(p.id)
-          }
-        when (version.sharing == 'hierarchy') || (version.sharing ==  'tree')
-          version.project.hierarchy.visible.each{|p|
-              affected_project_ids.push(p.id)
-            }
-        when version.sharing == 'system'
-          Project.visible.each{|p|
-              affected_project_ids.push(p.id)
-            }
-        end
-        # list affected projects
-        issue_condition = @query.statement_for('project_id')+' and '+ \
-                           'tracker_id in (?) and '+ \
-                           '( fixed_version_id = ? '+ \
-                            'or exists (select 1 '+ \
-                              'from issues as subissues '+ \
-                              'where issues.root_id = subissues.root_id '+ \
-                              'and subissues.fixed_version_id = ?) )'
-        if User.current.admin?
-          issue_condition = [issue_condition,
-                             tracker_list, version.id, version.id]
-        else
-          issue_condition = [issue_condition + \
-                              'and (assigned_to_id is null or assigned_to_id = ?)',
-                             tracker_list, version.id, version.id, User.current.id ]
-        end
+    .select{|version| !version.completed? } \
+    .each{|version|
+      issue_condition = @query.statement_for('project_id')+' and '+ \
+        'tracker_id in (?) and '+ \
+        '( fixed_version_id = ? '+ \
+        'or exists (select 1 '+ \
+        'from issues as subissues '+ \
+        'where issues.root_id = subissues.root_id '+ \
+        'and subissues.fixed_version_id = ?) )'
 
-        issues = Issue.visible.find(:all, :conditions => issue_condition ) \
-        .select{|iss|
-          (( iss.fixed_version_id == version.id && iss.root_id == iss.id) || Issue.find(:all, :conditions => ['root_id = ? and fixed_version_id = ?', iss.root_id, version.id]).length>0)
-        }
-      @user_synthesis[version] = VersionSynthesis.new(version, issues) if issues.length > 0
+      if User.current.admin?
+        issue_condition = [issue_condition,
+          tracker_list, version.id, version.id]
+      else
+        issue_condition = [issue_condition + \
+          'and (assigned_to_id is null or assigned_to_id = ?)',
+          tracker_list, version.id, version.id, User.current.id ]
+      end
+
+      grouped_issues = Hash.new
+      Issue.visible.find(:all, :conditions => issue_condition, :include => [:status,:tracker], :order => 'project_id,tracker_id' ) \
+      .each {|issue|
+        if grouped_issues[issue.project].nil?
+          grouped_issues[issue.project]=[issue]
+        else
+          grouped_issues[issue.project].push(issue)
+        end
+      }
+      
+      grouped_issues.each{|project, issues|
+        if @user_synthesis[project].nil?
+          @user_synthesis[project] = Hash.new
+        end
+        if @user_synthesis[project][version].nil?
+          @user_synthesis[project][version] = VersionSynthesis.new(project, version, issues)
+        else
+          @user_synthesis[project][version].add_issues(issues)
+        end
+      }
     }
-    @user_synthesis = @user_synthesis.sort{|a,b| [a[0].project.name.upcase, splitVersionName(a[0].name)]<=>[b[0].project.name.upcase, splitVersionName(b[0].name)]}
   end
   
   def initialize
@@ -124,14 +116,5 @@ class MyRoadmapsController < ApplicationController
       build_query_from_params
     end
     @query.filters={ 'project_id' => {:operator => "*", :values => [""]} } if @query.filters.length==0
-  end
-
-  # splits a version name into its constituents, returning an array.
-  # Numeric values are converted to a string on 10 positions to ease comparison
-  # with non-numeric strings
-  def splitVersionName(versionName)
-    return versionName.split(/[^a-zA-Z0-9]/).compact.map{ |elem|
-      (elem.to_i.to_s!=elem)?(elem.to_s):('%010d' % elem.to_i)
-     }
   end
 end

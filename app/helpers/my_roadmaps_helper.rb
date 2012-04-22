@@ -19,6 +19,19 @@ require_dependency 'query'
 
 module MyRoadmapsHelper
   
+  module VersionPatch
+    def self.included(base)
+      base.send(:include, InstanceMethods)
+    end
+    module InstanceMethods
+      def splitted_version_name
+        return self.name.split(/[^a-zA-Z0-9]/).compact.map{ |elem|
+          (elem.to_i.to_s!=elem)?(elem.to_s):('%010d' % elem.to_i)
+         }
+      end
+    end
+  end
+  
   module QueryPatch
     def self.included(base)
       base.send(:include, InstanceMethods)
@@ -72,4 +85,5 @@ module MyRoadmapsHelper
   end
   
   Query.send(:include, QueryPatch)
+  Version.send(:include, VersionPatch)
 end
