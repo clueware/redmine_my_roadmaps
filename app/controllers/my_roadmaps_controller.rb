@@ -42,8 +42,9 @@ class MyRoadmapsController < ApplicationController
     Version.find(:all, :conditions => [version_condition] ) \
     .select{|version| !version.completed? } \
     .each{|version|
-      issue_condition = @query.statement_for('project_id')+' and '+ \
-        'tracker_id in (?) and '+ \
+      issue_condition = ''
+      issue_condition += @query.statement_for('project_id')+' and ' unless @query.statement_for('project_id').nil? 
+      issue_condition += 'tracker_id in (?) and '+ \
         '( fixed_version_id = ? '+ \
         'or exists (select 1 '+ \
         'from issues as subissues '+ \
