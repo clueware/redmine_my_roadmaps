@@ -60,7 +60,8 @@
 						<td style="width: 5px;"/>
 					</tr>
 					<% 
-						synthesis.issues.sort_by{ |a| [a.wrapped_issue.root_id, \
+						synthesis.issues.sort_by{ |a| [((a.wrapped_issue.root_id==a.wrapped_issue.id)?(a.wrapped_issue.tracker.position):(a.wrapped_issue.root.tracker.position)), \
+								a.wrapped_issue.root_id,
 								((a.wrapped_issue.leaf?)?(a.wrapped_issue.parent_id):(a.wrapped_issue.id)),
 								a.depth,
 								a.wrapped_issue.tracker.position,
