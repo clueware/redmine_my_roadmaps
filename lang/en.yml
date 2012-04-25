@@ -17,7 +17,7 @@
 
 # English strings go here
 my_roadmaps_name: My roadmaps
-my_roadmaps_no_version_match: No version match criteria. 
+my_roadmaps_no_version_match: No version matching criteria. 
 permission_view_my_roadmaps: View "My Roadmaps"
 label_x_closed_issue_not_shown:
   zero: " (0 closed issue not shown)"
