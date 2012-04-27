@@ -33,6 +33,7 @@
 		<td <%="colspan=#{firstcolspan}" %> class="<%= 'tracker '+firsttdclass %>">
 			<div <%= issue_div_style %>>
 				<%= link_to_issue(issue, :project => (synthesis.project != issue.project)) %>
+				<%= " - "+link_to_user(issue.assigned_to) unless issue.assigned_to.nil? %>
 			</div>
 		</td>
 		<td <%="colspan=#{secondcolspan}" if secondcolspan>1  %> class="<%= secondtdclass %>">
