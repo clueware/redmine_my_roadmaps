@@ -51,14 +51,7 @@ class MyRoadmapsController < ApplicationController
         'where issues.root_id = subissues.root_id '+ \
         'and subissues.fixed_version_id = ?) )'
 
-      if User.current.admin?
-        issue_condition = [issue_condition,
-          tracker_list, version.id, version.id]
-      else
-        issue_condition = [issue_condition + \
-          'and (assigned_to_id is null or assigned_to_id = ?)',
-          tracker_list, version.id, version.id, User.current.id ]
-      end
+      issue_condition = [issue_condition, tracker_list, version.id, version.id]
 
       grouped_issues = Hash.new
       Issue.visible.find(:all, :conditions => issue_condition, :include => [:status,:tracker], :order => 'project_id,tracker_id' ) \
