@@ -17,7 +17,7 @@
 	end
 	if issue.closed?
 		secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:closed]+child_issue
-		else
+	else
 		if issue.done_ratio==0
 			secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:opened]+child_issue
 		elsif issue.done_ratio==100
