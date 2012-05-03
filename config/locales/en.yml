@@ -20,10 +20,6 @@ en:
   my_roadmaps_name: My roadmaps
   my_roadmaps_no_version_match: No version matching criteria. 
   permission_view_my_roadmaps: View My Roadmaps
-  label_x_closed_issue_not_shown:
-    zero: " (0 closed issue not shown)"
-    one: " (1 closed issue not shown)"
-    other: " (%{count} closed issues not shown)"
   label_for_root_issues: 
     zero: "(no root issue)"
     one: "(%{pct}% for root issue)"
