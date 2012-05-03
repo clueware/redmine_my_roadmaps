@@ -20,6 +20,7 @@ fr:
   my_roadmaps_name: Mes roadmaps
   my_roadmaps_no_version_match: Aucune version ne correspond au critère. 
   permission_view_my_roadmaps: Voir "Mes Roadmaps"
+  label_lighter_subtasks: Un libellé plus clair indique des sous-tâches n'ayant pas d'impact direct sur la progression.
   label_for_root_issues: 
     zero: "(pas de demande racine)"
     one: "(%{pct}% pour la demande racine)"

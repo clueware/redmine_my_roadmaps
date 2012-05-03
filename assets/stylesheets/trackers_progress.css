@@ -25,6 +25,10 @@ td.childissue div {
 	background: url("../../../images/bullet_arrow_right.png") no-repeat scroll 0 50% transparent;
 }
 
+p.subtaskpct, td.subtaskpct {
+	color: #999999
+}
+
 .t0_closed { background-color: #4DCC33 }
 .t0_done { background-color: #A6FF8C }
 .t0_opened { background-color: #FFFFFF }

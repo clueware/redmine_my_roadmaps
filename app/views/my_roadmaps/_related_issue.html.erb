@@ -27,6 +27,7 @@
 			secondtdclass = @tracker_styles[issue.tracker][:opened]+child_issue
 		end
 	end
+	secondtdclass += " subtaskpct" unless issue.leaf?
 %>
 <tr>
 	<td/>

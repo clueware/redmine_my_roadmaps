@@ -18,6 +18,7 @@
 %>
 <%= render :partial => 'filters', :locals => {:query => @query} %>
 <h2><%= l(:my_roadmaps_name) %></h2>
+<p class="subtaskpct" style="text-align: right; font-size: 90%;"><%=l(:label_lighter_subtasks)%></p>
 <div id="roadmaps">
 	<%
 		@user_synthesis.keys.sort_by{|project| project.self_and_ancestors.join('/') }.each{ |project|

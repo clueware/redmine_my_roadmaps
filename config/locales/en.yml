@@ -20,6 +20,7 @@ en:
   my_roadmaps_name: My roadmaps
   my_roadmaps_no_version_match: No version matching criteria. 
   permission_view_my_roadmaps: View My Roadmaps
+  label_lighter_subtasks: Lighter labels indicates subtasking with no direct impact on progress.
   label_for_root_issues: 
     zero: "(no root issue)"
     one: "(%{pct}% for root issue)"

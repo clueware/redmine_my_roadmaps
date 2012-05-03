@@ -1,6 +1,8 @@
 # Chinese strings goes here, courtesy of https://github.com/archonwang
 my_roadmaps_name: 我的路线图
+my_roadmaps_no_version_match: No version matching criteria. 
 permission_view_my_roadmaps: 查看我的路线图
+label_lighter_subtasks: Lighter labels indicates subtasking with no direct impact on progress.
 label_for_root_issues: 
   zero: "(no root issue)"
   one: "(%{pct}% for root issue)"
