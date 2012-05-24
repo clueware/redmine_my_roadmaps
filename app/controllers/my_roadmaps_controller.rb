@@ -30,9 +30,9 @@ class MyRoadmapsController < ApplicationController
     @user_synthesis = Hash.new
 
     if @query.has_filter?('tracker_id')
-      tracker_list = Tracker.find(:all, :conditions => [@query.statement_for('tracker_id').gsub('issues.tracker_id','trackers.id')+' and is_in_roadmap = ?',1], :order => 'position')
+      tracker_list = Tracker.find(:all, :is_in_roadmaps, :conditions => [@query.statement_for('tracker_id').gsub('issues.tracker_id','trackers.id')], :order => 'position')
     else 
-      tracker_list = Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1], :order => 'position')
+      tracker_list = Tracker.find(:all, :is_in_roadmaps, :order => 'position')
     end
 
     # condition hacked from the Query model to match versions
@@ -79,7 +79,7 @@ class MyRoadmapsController < ApplicationController
   def initialize
     index=0
     @tracker_styles = Hash.new
-    Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1], :order => 'position' ).each{ |tracker|
+    Tracker.find(:all, :is_in_roadmaps, :order => 'position' ).each{ |tracker|
       @tracker_styles[tracker]=Hash.new
       @tracker_styles[tracker][:opened] = "t"+(index%10).to_s+"_opened"
       @tracker_styles[tracker][:done] = "t"+(index%10).to_s+"_done"
@@ -101,10 +101,10 @@ class MyRoadmapsController < ApplicationController
   def get_query
     @query = Query.new(:name => "_", :filters => {})
     user_projects = Project.visible
-    user_trackers = Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1])
+    user_trackers = Tracker.find(:all, :is_in_roadmaps)
     filters = Hash.new
     filters['project_id'] = { :type => :list_optional, :order => 1, :values => user_projects.sort{|a,b| a.self_and_ancestors.join('/')<=>b.self_and_ancestors.join('/') }.collect{|s| [s.self_and_ancestors.join('/'), s.id.to_s] } } unless user_projects.empty?
-    filters['tracker_id'] = { :type => :list, :order => 2, :values => Tracker.find(:all, :conditions => ['is_in_roadmap = ?', 1], :order => 'position' ).collect{|s| [s.name, s.id.to_s] } } unless user_trackers.empty?
+    filters['tracker_id'] = { :type => :list, :order => 2, :values => Tracker.find(:all, :is_in_roodmaps, :order => 'position' ).collect{|s| [s.name, s.id.to_s] } } unless user_trackers.empty?
     @query.override_available_filters(filters)
     if params[:f]
       build_query_from_params
