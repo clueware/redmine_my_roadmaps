@@ -77,6 +77,7 @@ class MyRoadmapsController < ApplicationController
   end
   
   def initialize
+  	super
     index=0
     @tracker_styles = Hash.new
     Tracker.find(:all, :is_in_roadmaps, :order => 'position' ).each{ |tracker|
