@@ -29,6 +29,10 @@ p.subtaskpct, td.subtaskpct {
 	color: #999999
 }
 
+table.progress {
+	border: 1px solid #D7D7D7;
+}
+
 .t0_closed { background-color: #4DCC33 }
 .t0_done { background-color: #A6FF8C }
 .t0_opened { background-color: #FFFFFF }
