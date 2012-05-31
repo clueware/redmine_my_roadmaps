@@ -15,15 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-require 'redmine'
-
-require_dependency 'my_roadmaps/hooks'
-
 Redmine::Plugin.register :redmine_my_roadmaps do
   name 'My Roadmaps plugin'
   author 'Stéphane Rondinaud'
   description 'This plugin provides a global roadmaps for all the projects of the user.'
-  version '0.1.6'
+  version '0.2.0'
   url 'https://github.com/clueware/redmine_my_roadmaps'
 
   permission :view_my_roadmaps, :my_roadmaps => :index

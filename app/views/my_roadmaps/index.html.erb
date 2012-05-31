@@ -78,3 +78,8 @@
 	<% } # project %>
 	<h3><%= l(:my_roadmaps_no_version_match) if @user_synthesis.empty? %></h3>
 </div>
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'trackers_progress', :plugin => 'redmine_my_roadmaps', :media => 'all' %>
+<% end %>
+
+<% html_title(l(:my_roadmaps_name)) -%>

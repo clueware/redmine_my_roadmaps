@@ -21,10 +21,9 @@ class MyRoadmapsController < ApplicationController
   unloadable
   before_filter :authorize_my_roadmaps 
 
-  helper :queries
   include QueriesHelper
-  def index
 
+  def index
     get_query
 
     @user_synthesis = Hash.new
