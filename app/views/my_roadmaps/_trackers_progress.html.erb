@@ -47,7 +47,8 @@
 		<%= tracker_wrapper.wrapped_tracker.name+" "+(tracker_wrapper.overall_root_done_pct).round.to_s %>%
 	<% end %>
 	<%=l(:label_for_root_issues, :count => tracker_wrapper.total_root_nb.round, :pct => (tracker_wrapper.overall_root_done_pct).round ) unless (tracker_wrapper.total_root_nb == tracker_wrapper.total_nb) %></p>
-<p class="progress-info<%=" subtaskpct" if tracker_wrapper.is_subtasks %>"><%= link_to_if(tracker_wrapper.closed_nb > 0, 
+<p class="progress-info<%=" subtaskpct" if tracker_wrapper.is_subtasks %>">
+	<%= link_to_if(tracker_wrapper.closed_nb > 0, 
 			l(:label_x_closed_issues_abbr, :count => tracker_wrapper.closed_nb), 
 			:controller => 'issues', 
 			:action => 'index', 
@@ -56,8 +57,8 @@
 			:status_id => 'c', 
 			:fixed_version_id => synthesis.version, 
 			:set_filter => 1) +
-		"("+tracker_wrapper.closed_pct.round.to_s+"%) "+ 
-		link_to_if(tracker_wrapper.opened_nb > 0, 
+		"("+tracker_wrapper.closed_pct.round.to_s+"%) "%>
+	<%= link_to_if(tracker_wrapper.opened_nb > 0, 
 			l(:label_x_open_issues_abbr, :count => tracker_wrapper.opened_nb), 
 			:controller => 'issues', 
 			:action => 'index', 
