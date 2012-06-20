@@ -21,5 +21,19 @@ class IssueWrapper
     @depth = depth    
   end
   
+  def <=>(other)
+    [((self.wrapped_issue.root_id==self.wrapped_issue.id)?(self.wrapped_issue.tracker):(self.wrapped_issue.root.tracker)), \
+      self.wrapped_issue.root_id, \
+      self.wrapped_issue.self_and_ancestors.to_a, \
+      self.wrapped_issue.tracker, \
+      self.wrapped_issue.id] \
+    <=> \
+    [((other.wrapped_issue.root_id==other.wrapped_issue.id)?(other.wrapped_issue.tracker):(other.wrapped_issue.root.tracker)), \
+      other.wrapped_issue.root_id, \
+      other.wrapped_issue.self_and_ancestors.to_a, \
+      other.wrapped_issue.tracker, \
+      other.wrapped_issue.id]
+  end
+
   attr_reader :wrapped_issue, :depth
 end
