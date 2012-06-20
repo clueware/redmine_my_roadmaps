@@ -60,11 +60,7 @@
 						<td style="width: 5px;"/>
 					</tr>
 					<% 
-						synthesis.issues.sort_by{ |a| [((a.wrapped_issue.root_id==a.wrapped_issue.id)?(a.wrapped_issue.tracker.position):(a.wrapped_issue.root.tracker.position)), \
-								a.wrapped_issue.root_id,
-								a.wrapped_issue.self_and_ancestors,
-								a.wrapped_issue.tracker.position,
-								a.wrapped_issue.id]}.each { |issue_wrapper|
+synthesis.issues.sort.each { |issue_wrapper|
 					%> 
 						<%= render :partial => 'related_issue', :locals => {:synthesis => synthesis, :issue_wrapper => issue_wrapper } %>
 					<% 
