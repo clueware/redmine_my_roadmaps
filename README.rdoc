@@ -4,6 +4,10 @@ This plugin provides global roadmaps for all the projects of the user.
 
 All your comments are greatly welcome: this is my first attempt at Ruby, Rails and Redmine plugin, so it most probably won't qualify as "state of the art".
 
+Please note that the main development branch (master) is for the Redmine 1.x. The Redmine_2.0 branch track Redmine 2.0.x compatibility.
+
+As usual, each version is available on Redmine plugin catalog in both flavors (Redmine 1 and Redmine 2): http://www.redmine.org/plugins/my_roadmaps
+
 It is licensed under the GPL v2. See http://www.gnu.org/licenses/old-licenses/gpl-2.0.html for further details.
 
 Here's a screenshot: https://github.com/clueware/redmine_my_roadmaps/raw/master/assets/screenshot/latest_screenshot.png
