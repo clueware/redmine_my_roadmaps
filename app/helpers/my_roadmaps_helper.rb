@@ -1,3 +1,4 @@
+# encoding: utf-8
 # My Roadmaps - Redmine plugin to expose global roadmaps
 # Copyright (C) 2012 Stéphane Rondinaud
 #
