@@ -41,6 +41,9 @@ module MyRoadmapsHelper
     module InstanceMethods
       def override_available_filters(new_filters=nil)
         @available_filters = new_filters if (!new_filters.nil? && new_filters.is_a?(Hash))
+        @available_filters.each do |field, options|
+          options[:name] ||= l("field_#{field}".gsub(/_id$/, ''))
+        end
       end
       
       def statement_for(field_name)
