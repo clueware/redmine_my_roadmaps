@@ -76,6 +76,7 @@ synthesis.issues.sort.each { |issue_wrapper|
 	<h3><%= l(:my_roadmaps_no_version_match) if @user_synthesis.empty? %></h3>
 </div>
 <% content_for :header_tags do %>
+  <%= javascript_include_tag 'select_list_move' %>
   <%= stylesheet_link_tag 'trackers_progress', :plugin => 'redmine_my_roadmaps', :media => 'all' %>
 <% end %>
 
