@@ -72,7 +72,9 @@ synthesis.issues.sort.each { |issue_wrapper|
 			<% end %>
 		<% } # version %>
 	<% } # project %>
-	<h3><%= l(:my_roadmaps_no_version_match) if @user_synthesis.empty? %></h3>
+	<% if @user_synthesis.empty? %>
+		<h3><%= l(:my_roadmaps_no_version_match) %></h3>
+	<% end %>
 </div>
 <% content_for :header_tags do %>
   <%= javascript_include_tag 'select_list_move' %>
