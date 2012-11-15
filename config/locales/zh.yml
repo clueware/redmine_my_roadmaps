@@ -6,6 +6,6 @@ zh:
   label_lighter_subtasks: 浅色的标签显示子任务没有直接影响进度。
   label_for_root_issues: 
     zero: "(没有根本问题)"
-    one: "(%{pct}%个根本问题)"
-    other: "(第%{pct}%个根本问题，共%{count}个)"
+    one: "(%{pct}%%个根本问题)"
+    other: "(第%{pct}%%个根本问题，共%{count}个)"
   button_refresh: 刷新
