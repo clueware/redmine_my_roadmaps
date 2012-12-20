@@ -22,7 +22,7 @@ class MyRoadmapsController < ApplicationController
   unloadable
   before_filter :authorize_my_roadmaps 
 
-  include QueriesHelper
+  helper QueriesHelper
 
   def index
     get_query
