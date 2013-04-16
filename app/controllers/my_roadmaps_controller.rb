@@ -23,7 +23,6 @@ class MyRoadmapsController < ApplicationController
   before_filter :authorize_my_roadmaps 
 
   helper :Queries
-  include QueriesHelper
 
   def index
     get_query
@@ -109,7 +108,7 @@ class MyRoadmapsController < ApplicationController
     filters['tracker_id'] = { :type => :list, :order => 2, :values => Tracker.find(:all, :is_in_roodmaps, :order => 'position' ).collect{|s| [s.name, s.id.to_s] } } unless user_trackers.empty?
     @query.override_available_filters(filters)
     if params[:f]
-      build_query_from_params
+      @query.build_from_params(params)
     end
     @query.filters={ 'project_id' => {:operator => "*", :values => [""]} } if @query.filters.length==0
   end
