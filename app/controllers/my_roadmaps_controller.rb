@@ -30,20 +30,20 @@ class MyRoadmapsController < ApplicationController
     @user_synthesis = Hash.new
 
     if @query.has_filter?('tracker_id')
-      tracker_list = Tracker.find(:all, :is_in_roadmaps, :conditions => [@query.statement_for('tracker_id').gsub('issues.tracker_id','trackers.id')], :order => 'position')
-    else 
-      tracker_list = Tracker.find(:all, :is_in_roadmaps, :order => 'position')
+      tracker_list = Tracker.where(is_in_roadmap:true, id: @query.values_for('tracker_id')).order(:position).ids
+    else
+      tracker_list = Tracker.where(is_in_roadmap: true).order(:position).ids
     end
 
     # condition hacked from the Query model to match versions
     version_condition = '(versions.status <> \'closed\')'
     version_condition += ' and ('+@query.statement_for('project_id').gsub('issues','versions')+' or exists (select 1 from issues where issues.fixed_version_id = versions.id and '+@query.statement_for('project_id')+'))' if @query.has_filter?('project_id')
 
-    Version.find(:all, :conditions => [version_condition] ) \
+    Version.where(version_condition).all() \
     .select{|version| !version.completed? } \
     .each{|version|
       issue_condition = ''
-      issue_condition += @query.statement_for('project_id')+' and ' unless @query.statement_for('project_id').nil? 
+      issue_condition += @query.statement_for('project_id')+' and ' unless @query.statement_for('project_id').nil?
       issue_condition += 'tracker_id in (?) and '+ \
         '( fixed_version_id = ? '+ \
         'or exists (select 1 '+ \
@@ -54,14 +54,13 @@ class MyRoadmapsController < ApplicationController
       issue_condition = [issue_condition, tracker_list, version.id, version.id]
 
       grouped_issues = Hash.new
-      Issue.visible.find(:all, :conditions => issue_condition, :include => [:status,:tracker], :order => 'project_id,tracker_id' ) \
-      .each {|issue|
+      Issue.visible.where(issue_condition).includes([:status,:tracker]).order(:project_id, :tracker_id).find_each do |issue|
         if grouped_issues[issue.project].nil?
           grouped_issues[issue.project]=[issue]
         else
           grouped_issues[issue.project].push(issue)
         end
-      }
+      end
       
       grouped_issues.each{|project, issues|
         if @user_synthesis[project].nil?
@@ -80,13 +79,13 @@ class MyRoadmapsController < ApplicationController
   	super
     index=0
     @tracker_styles = Hash.new
-    Tracker.find(:all, :is_in_roadmaps, :order => 'position' ).each{ |tracker|
+    Tracker.where(is_in_roadmap: true).order(:position).find_each do |tracker|
       @tracker_styles[tracker]=Hash.new
       @tracker_styles[tracker][:opened] = "t"+(index%10).to_s+"_opened"
       @tracker_styles[tracker][:done] = "t"+(index%10).to_s+"_done"
       @tracker_styles[tracker][:closed] = "t"+(index%10).to_s+"_closed"
       index += 1
-    }
+    end
   end
   
   private
@@ -102,10 +101,10 @@ class MyRoadmapsController < ApplicationController
   def get_query
     @query = Query.new(:name => "_", :filters => {})
     user_projects = Project.visible
-    user_trackers = Tracker.find(:all, :is_in_roadmaps)
+    user_trackers = Tracker.where(is_in_roadmap: true).all;
     filters = Hash.new
     filters['project_id'] = { :type => :list_optional, :order => 1, :values => user_projects.sort{|a,b| a.self_and_ancestors.join('/')<=>b.self_and_ancestors.join('/') }.collect{|s| [s.self_and_ancestors.join('/'), s.id.to_s] } } unless user_projects.empty?
-    filters['tracker_id'] = { :type => :list, :order => 2, :values => Tracker.find(:all, :is_in_roodmaps, :order => 'position' ).collect{|s| [s.name, s.id.to_s] } } unless user_trackers.empty?
+    filters['tracker_id'] = { :type => :list, :order => 2, :values => Tracker.where(is_in_roadmap: true).order(:position).all.collect{|s| [s.name, s.id.to_s] } } unless user_trackers.empty?
     @query.override_available_filters(filters)
     if params[:f]
       @query.build_from_params(params)

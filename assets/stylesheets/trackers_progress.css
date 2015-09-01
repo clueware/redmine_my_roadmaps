@@ -13,6 +13,8 @@ table.tracker tr td {
 	white-space: nowrap; 
 	text-align: right;
 	overflow: visible;
+	/* application.css is setting this to 10px */
+	padding-right: 0px;
 }
 table.tracker tr td div {
 	position: absolute;

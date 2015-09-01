@@ -10,7 +10,7 @@
     </fieldset>
     </div>
     <p class="buttons hide-when-print">
-	    <%= link_to_function l(:button_apply), 'submit_query_form("query_form")', :class => 'icon icon-checked' %>
+      <%= link_to_function l(:button_apply), '$("#query_form").submit()', :class => 'icon icon-checked' %>
 	    <%= link_to l(:button_clear), { :set_filter => 0 }, :class => 'icon icon-reload'  %>
     </p>
 <% end %>
