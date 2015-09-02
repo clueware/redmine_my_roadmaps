@@ -1,5 +1,5 @@
 # encoding: utf-8
-# My Roadmaps - Redmine plugin to expose global roadmaps 
+# My Roadmaps - Redmine plugin to expose global roadmaps
 # Copyright (C) 2012 Stéphane Rondinaud
 #
 # This program is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@ Redmine::Plugin.register :redmine_my_roadmaps do
   name 'My Roadmaps plugin'
   author 'Stéphane Rondinaud'
   description 'This plugin provides a global roadmaps for all the projects of the user.'
-  version '0.2.0_redmine3.0'
+  version '0.2.1_redmine3.0'
   url 'https://github.com/clueware/redmine_my_roadmaps'
 
   permission :view_my_roadmaps, :my_roadmaps => :index

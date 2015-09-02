@@ -1,5 +1,5 @@
 <%# coding: UTF-8 %>
-<% 	
+<%
 	issue = issue_wrapper.wrapped_issue
 	if issue_wrapper.depth >0
 		child_issue = " childissue"
@@ -17,15 +17,15 @@
 		secondcolspan = synthesis.pct_done.length-firstcolspan-1
 	end
 	if issue.closed?
-		secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:closed]+child_issue
+		secondtdclass = firsttdclass = @tracker_styles[issue.tracker.id][:closed]+child_issue
 	else
 		if issue.done_ratio==0
-			secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:opened]+child_issue
+			secondtdclass = firsttdclass = @tracker_styles[issue.tracker.id][:opened]+child_issue
 		elsif issue.done_ratio==100
-			secondtdclass = firsttdclass = @tracker_styles[issue.tracker][:done]+child_issue
+			secondtdclass = firsttdclass = @tracker_styles[issue.tracker.id][:done]+child_issue
 		else
-			firsttdclass = @tracker_styles[issue.tracker][:done]+child_issue
-			secondtdclass = @tracker_styles[issue.tracker][:opened]+child_issue
+			firsttdclass = @tracker_styles[issue.tracker.id][:done]+child_issue
+			secondtdclass = @tracker_styles[issue.tracker.id][:opened]+child_issue
 		end
 	end
 	secondtdclass += " subtaskpct" unless issue.leaf?
@@ -49,4 +49,3 @@
 		</td>
 	<td/>
 </tr>
-

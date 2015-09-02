@@ -1,5 +1,5 @@
 # encoding: utf-8
-# My Roadmaps - Redmine plugin to expose global roadmaps 
+# My Roadmaps - Redmine plugin to expose global roadmaps
 # Copyright (C) 2012 Stéphane Rondinaud
 #
 # This program is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@ require 'version_synthesis'
 
 class MyRoadmapsController < ApplicationController
   unloadable
-  before_filter :authorize_my_roadmaps 
+  before_filter :authorize_my_roadmaps
 
   helper :Queries
 
@@ -54,14 +54,14 @@ class MyRoadmapsController < ApplicationController
       issue_condition = [issue_condition, tracker_list, version.id, version.id]
 
       grouped_issues = Hash.new
-      Issue.visible.where(issue_condition).includes([:status,:tracker]).order(:project_id, :tracker_id).find_each do |issue|
+      Issue.visible.where(issue_condition).includes([:status,:tracker]).find_each do |issue|
         if grouped_issues[issue.project].nil?
           grouped_issues[issue.project]=[issue]
         else
           grouped_issues[issue.project].push(issue)
         end
       end
-      
+
       grouped_issues.each{|project, issues|
         if @user_synthesis[project].nil?
           @user_synthesis[project] = Hash.new
@@ -74,22 +74,22 @@ class MyRoadmapsController < ApplicationController
       }
     }
   end
-  
+
   def initialize
   	super
     index=0
     @tracker_styles = Hash.new
-    Tracker.where(is_in_roadmap: true).order(:position).find_each do |tracker|
-      @tracker_styles[tracker]=Hash.new
-      @tracker_styles[tracker][:opened] = "t"+(index%10).to_s+"_opened"
-      @tracker_styles[tracker][:done] = "t"+(index%10).to_s+"_done"
-      @tracker_styles[tracker][:closed] = "t"+(index%10).to_s+"_closed"
+    Tracker.where(is_in_roadmap: true).order(:position).ids.each do |tracker_id|
+      @tracker_styles[tracker_id]=Hash.new
+      @tracker_styles[tracker_id][:opened] = "t"+(index%10).to_s+"_opened"
+      @tracker_styles[tracker_id][:done] = "t"+(index%10).to_s+"_done"
+      @tracker_styles[tracker_id][:closed] = "t"+(index%10).to_s+"_closed"
       index += 1
     end
   end
-  
+
   private
-  
+
   def authorize_my_roadmaps
     if !(User.current.allowed_to?(:view_my_roadmaps, nil, :global => true) || User.current.admin?)
       render_403
@@ -97,7 +97,7 @@ class MyRoadmapsController < ApplicationController
     end
     return true
   end
-  
+
   def get_query
     @query = Query.new(:name => "_", :filters => {})
     user_projects = Project.visible
