@@ -99,7 +99,7 @@ class MyRoadmapsController < ApplicationController
   end
 
   def get_query
-    @query = Query.new(:name => "_", :filters => {})
+    @query = Query.new(:name => "_", :filters => {}, :queried_class => Issue)
     user_projects = Project.visible
     user_trackers = Tracker.where(is_in_roadmap: true).all;
     filters = Hash.new
