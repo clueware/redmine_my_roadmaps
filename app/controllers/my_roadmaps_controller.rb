@@ -30,7 +30,7 @@ class MyRoadmapsController < ApplicationController
     @user_synthesis = Hash.new
 
     if @query.has_filter?('tracker_id')
-      tracker_list = Tracker.where(is_in_roadmap:true, id: @query.values_for('tracker_id')).order(:position).ids
+      tracker_list = Tracker.where(is_in_roadmap: true).where(@query.statement_for('tracker_id').gsub('issues.tracker_id','trackers.id')).order(:position).ids
     else
       tracker_list = Tracker.where(is_in_roadmap: true).order(:position).ids
     end
