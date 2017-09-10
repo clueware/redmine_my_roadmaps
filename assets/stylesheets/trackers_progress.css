@@ -10,14 +10,14 @@ h2.project {
 	margin-top: 1em;
 }
 table.tracker tr td {
-	white-space: nowrap; 
+	white-space: nowrap;
 	text-align: right;
 	overflow: visible;
 	/* application.css is setting this to 10px */
 	padding-right: 0px;
 }
 table.tracker tr td div {
-	position: absolute;
+	position: relative;
 	text-align: left;
 	left: 1.5em;
 }
