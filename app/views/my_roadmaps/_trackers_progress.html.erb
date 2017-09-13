@@ -1,6 +1,6 @@
 <%# coding: UTF-8 %>
 <%
-	synthesis.trackers.each{ |tracker_wrapper|
+	synthesis.trackers.sort_by{|track_wrap| track_wrap.wrapped_tracker.position}.each{ |tracker_wrapper|
 
 		opened_left_pct = 100-tracker_wrapper.overall_done_pct.round
 		opened_root_left_pct = 100-tracker_wrapper.overall_root_done_pct.round
