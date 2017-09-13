@@ -106,9 +106,6 @@ class MyRoadmapsController < ApplicationController
 
     add_available_filter "tracker_id",
       :type => :list, :values => trackers.select{|t| t.is_in_roadmap}.collect{|s| [s.name, s.id.to_s] }
-
-    add_available_filter "fixed_version_id",
-     :type => :list_optional, :values => lambda { fixed_version_values }
     end
   end
 
