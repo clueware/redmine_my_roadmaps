@@ -29,6 +29,12 @@ class MyRoadmapsController < ApplicationController
 
     @user_synthesis = Hash.new
 
+    if @query.has_filter?('tracker_id')
+      tracker_list = Tracker.where(is_in_roadmap: true).where(@query.statement_for('tracker_id').gsub('issues.tracker_id','trackers.id')).order(:position).ids
+    else
+      tracker_list = Tracker.where(is_in_roadmap: true).order(:position).ids
+    end
+
     # condition hacked from the Query model to match versions
     version_condition = '(versions.status <> \'closed\')'
     version_condition += ' and ('+@query.statement_for('project_id').gsub('issues','versions')+' or exists (select 1 from issues where issues.fixed_version_id = versions.id and '+@query.statement_for('project_id')+'))' if @query.has_filter?('project_id')
@@ -36,23 +42,34 @@ class MyRoadmapsController < ApplicationController
     Version.where(version_condition).all() \
     .select{|version| !version.completed? } \
     .each{|version|
+      issue_condition = ''
+      issue_condition += @query.statement_for('project_id')+' and ' unless @query.statement_for('project_id').nil?
+      issue_condition += 'tracker_id in (?) and '+ \
+        '( fixed_version_id = ? '+ \
+        'or exists (select 1 '+ \
+        'from issues as subissues '+ \
+        'where issues.root_id = subissues.root_id '+ \
+        'and subissues.fixed_version_id = ?) )'
+
+      issue_condition = [issue_condition, tracker_list, version.id, version.id]
+
       grouped_issues = Hash.new
-      @query.issues.select{|i| i.tracker.is_in_roadmap}.each{|issue|
+      Issue.visible.where(issue_condition).includes([:status,:tracker]).find_each do |issue|
         if grouped_issues[issue.project].nil?
           grouped_issues[issue.project]=[issue]
         else
           grouped_issues[issue.project].push(issue)
         end
-      }
+      end
 
       grouped_issues.each{|project, issues|
         if @user_synthesis[project].nil?
           @user_synthesis[project] = Hash.new
         end
         if @user_synthesis[project][version].nil?
-          @user_synthesis[project][version] = VersionSynthesis.new(project, version, issues)
+          @user_synthesis[project][version] = VersionSynthesis.new(project, version, issues.select{|i| i.project_id == project.id})
         else
-          @user_synthesis[project][version].add_issues(issues)
+          @user_synthesis[project][version].add_issues(issues.select{|i| i.project_id == project.id})
         end
       }
     }
@@ -101,7 +118,7 @@ class MyRoadmapsController < ApplicationController
 
     def initialize_available_filters
       add_available_filter("project_id",
-      :type => :list, :values => lambda { project_values }
+      :type => :list, :values => Project.visible.collect{|p| [p.name, p.id.to_s]}
     ) if project.nil?
 
     add_available_filter "tracker_id",
@@ -114,6 +131,5 @@ class MyRoadmapsController < ApplicationController
     if params[:f]
       @query.build_from_params(params)
     end
-    @query.filters={ 'project_id' => {:operator => "*", :values => [""]} } if @query.filters.length==0
   end
 end
