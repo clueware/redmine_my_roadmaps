@@ -8,7 +8,8 @@
 		done_tracker_style = @tracker_styles[tracker_wrapper.wrapped_tracker.id][:done]
 		opened_tracker_style = @tracker_styles[tracker_wrapper.wrapped_tracker.id][:opened]
 %>
-<table class="progress" style="width: 40%; height: 1em;">
+<div class="version-overview">
+<table class="progress summary">
 	<% if tracker_wrapper.closed_leaves+(tracker_wrapper.overall_done_pct-tracker_wrapper.closed_leaves_pct) > 0 %>
 		<tr>
 			<% if tracker_wrapper.closed_leaves.round > 0 %>
@@ -70,4 +71,5 @@
 			:set_filter => 1)+
 		"("+tracker_wrapper.opened_pct.round.to_s+"%)" %>
 </p>
+</div>
 <%	} # synthesis.trackers.each %>

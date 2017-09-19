@@ -28,47 +28,51 @@
 			<%= link_to_if(project.visible?(User.current),project.name, {:controller => 'projects', :action => 'show', :id => project.id}) %>
 		</h2>
 		<%
-			@user_synthesis[project].keys.sort{|v1,v2| v1.splitted_version_name<=>v2.splitted_version_name}.each{ |version|
+			@user_synthesis[project].keys.sort{|v1,v2| v1<=>v2}.each{ |version|
 				synthesis = @user_synthesis[project][version]
 		%>
-			<h3 class="version">
-				<%= link_to_if(project.visible?(User.current),project.name, {:controller => 'projects', :action => 'show', :id => project.id}) %> -
-				<%= link_to_if(version.visible?(User.current),version.name, {:controller => 'versions', :action => 'show', :id => version.id}) %>
-				<span style="font-size:0.7em;">
-					<%= "("+l(:version_status_locked)+")" if version.status == 'locked' %>
-					<%= link_to l(:button_edit), {:controller => 'versions', :action => 'edit', :id => version.id} if version.visible?(User.current) %>
-				</span>
-			</h3>
-
+		<article class="version-article version-incompleted version-open" style="clear: both;">
+			<header>
+				<h3 class="version">
+					<%= link_to_if(project.visible?(User.current),project.name, {:controller => 'projects', :action => 'show', :id => project.id}) %> -
+					<%= link_to_if(version.visible?(User.current),version.name, {:controller => 'versions', :action => 'show', :id => version.id}) %>
+					<span style="font-size:0.7em;">
+						<%= "("+l(:version_status_locked)+")" if version.status == 'locked' %>
+						<%= link_to l(:button_edit), {:controller => 'versions', :action => 'edit', :id => version.id} if version.visible?(User.current) %>
+					</span>
+				</h3>
+			</header>
 			<%= render :partial => 'trackers_progress', :locals => {:synthesis => synthesis} %>
-
 			<% if !synthesis.pct_done.nil? %>
-				<table class="list tracker" style="width: 70%; font-size: 90%;">
-					<caption>
-						<%= l(:label_related_issues) %>
-					</caption>
-					<tr style="height: 5px; padding: 0px; margin:0px;">
-						<td style="width: 5px;"/>
+				<div class="version-overview">
+					<table class="progress progress-13">
+						<caption>
+							<%= l(:label_related_issues) %>
+						</caption>
+						<tr>
+							<td style="width: 5px;"/>
+							<%
+								synthesis.pct_done.each_index{|i|
+								if i>0
+							%>
+								<td style="width: <%=synthesis.pct_done[i]-synthesis.pct_done[i-1]%>%;"/>
+							<%
+								end
+							}
+							%>
+							<td style="width: 5px;"/>
+						</tr>
 						<%
-							synthesis.pct_done.each_index{|i|
-							if i>0
+							synthesis.issues.sort.each { |issue_wrapper|
 						%>
-							<td style="width: <%=synthesis.pct_done[i]-synthesis.pct_done[i-1]%>%;"/>
+							<%= render :partial => 'related_issue', :locals => {:synthesis => synthesis, :issue_wrapper => issue_wrapper } %>
 						<%
-							end
-						}
+							}
 						%>
-						<td style="width: 5px;"/>
-					</tr>
-					<%
-						synthesis.issues.sort.each { |issue_wrapper|
-					%>
-						<%= render :partial => 'related_issue', :locals => {:synthesis => synthesis, :issue_wrapper => issue_wrapper } %>
-					<%
-						}
-					%>
-					<tr style="height: 5px; padding: 0px; margin:0px;"><td colspan="12"/></tr>
-				</table>
+						<tr style="height: 5px; padding: 0px; margin:0px;"><td colspan="12"/></tr>
+					</table>
+				</div>
+			</article>
 			<% end %>
 		<% } # version %>
 	<% } # project %>

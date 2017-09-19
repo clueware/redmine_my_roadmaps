@@ -45,7 +45,7 @@
 			</div>
 		</td>
 		<td <%="colspan=#{secondcolspan}" if secondcolspan>1  %> class="<%= secondtdclass %>">
-			<%= (issue.closed?)?100:issue.done_ratio %>%
+			<div><%= (issue.closed?)?100:issue.done_ratio %>%</div>
 		</td>
 	<td/>
 </tr>

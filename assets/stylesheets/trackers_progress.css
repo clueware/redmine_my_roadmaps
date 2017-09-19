@@ -9,30 +9,52 @@ h2.project {
 	border-bottom: 1px solid black;
 	margin-top: 1em;
 }
-table.tracker tr td {
-	white-space: nowrap;
-	text-align: right;
-	overflow: visible;
-	/* application.css is setting this to 10px */
-	padding-right: 0px;
-}
-table.tracker tr td div {
-	position: relative;
-	text-align: left;
-	left: 1.5em;
+
+#roadmaps table.progress {
+	width: 100%;
+	font-size: 90%;
 }
 
-td.childissue div {
+#roadmaps table.summary {
+	width: 50%;
+}
+
+
+#roadmaps table.progress {
+	border: 1px solid #D7D7D7;
+}
+#roadmaps article table.progress:last-child tr {
+	border-bottom: 1px solid #D7D7D7;
+	border-top: 1px solid #D7D7D7;
+}
+
+#roadmaps article table.progress:last-child,
+#roadmaps article table.progress:last-child tr:first-child,
+#roadmaps article table.progress:last-child tr:last-child {
+	border: none;
+}
+
+#roadmaps article table.progress:last-child td {
+	white-space: nowrap;
+	text-align: right;
+	vertical-align: baseline;
+}
+
+#roadmaps article table.progress:last-child td.tracker div {
+	position: absolute;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 75%;
+}
+
+#roadmaps article table.progress:last-child td.childissue:first-child div {
 	padding-left: 16px;
 	background: url("../../../images/bullet_arrow_right.png") no-repeat scroll 0 50% transparent;
 }
 
 p.subtaskpct, td.subtaskpct {
 	color: #999999
-}
-
-table.progress {
-	border: 1px solid #D7D7D7;
 }
 
 .t0_closed { background-color: #4DCC33 }
