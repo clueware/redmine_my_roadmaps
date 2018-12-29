@@ -4,11 +4,10 @@ This plugin provides global roadmaps for all the projects of the user.
 
 All your comments are greatly welcome: this is my first attempt at Ruby, Rails and Redmine plugin, so it most probably won't qualify as "state of the art".
 
-Please note that the main development branch (master) is for the Redmine 1.x. The Redmine_2.0 branch track Redmine 2.0.x compatibility, Redmine_2.1 branch is suitable for both Redmine 2.1 and 2.2 versions and Redmine_2.3 for 2.3, 2.4 and 2.6 versions.
+Please note that the main development branch (master) is for the Redmine 1.x. 
+The other branches are for their respective version, up to the next one - Redmine_2.0 branch track Redmine 2.0.x compatibility, Redmine_2.1 branch is suitable for both Redmine 2.1 and 2.2 versions, Redmine_2.3 is for all 2.x versions including and after 2.3, Redmine_3.0 is for the 3.x version up to Redmine_3.4, which is compatible for Redmine 3.4.
 
-A release for Redmine 3.0 is still pending.
-
-As usual, each version is available on Redmine plugin catalog in both flavors (Redmine 1 and Redmine 2): http://www.redmine.org/plugins/my_roadmaps
+As usual, each version is available on Redmine plugin catalog: http://www.redmine.org/plugins/my_roadmaps
 
 It is licensed under the GPL v2. See http://www.gnu.org/licenses/old-licenses/gpl-2.0.html for further details.
 
